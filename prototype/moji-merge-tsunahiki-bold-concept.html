@@ -160,13 +160,22 @@ button {
   .title h1 { -webkit-text-stroke-width: 6px; }
   .kana { -webkit-text-stroke-width: 6px; }
 }
+body.high-contrast {
+  background: #000 !important;
+}
+body.high-contrast .word-card { background: #fff !important; border-color: #000 !important; color: #000 !important; }
+body.high-contrast .word-card.cpu-card { background: #ffeb35 !important; }
+body.high-contrast .word-card .kana { color: #000 !important; -webkit-text-stroke-color: #ffeb35 !important; text-shadow: none !important; }
+body.high-contrast .pill { background: #fff !important; color: #000 !important; }
+body.high-contrast .pill b { color: #d40000 !important; }
+body.high-contrast canvas { border-color: #ffeb35 !important; }
 </style>
 </head>
 <body>
 <main class="app" id="app">
   <section class="title">
     <h1>モジマージ<br><span class="red">綱引き！</span></h1>
-    <div class="subtitle">45秒勝負 ／ 打てば打つほど味方が増える</div>
+    <div class="subtitle" id="subtitle">45秒勝負 ／ 打てば打つほど味方が増える</div>
   </section>
 
   <section class="hud">
@@ -181,7 +190,11 @@ button {
     <div class="overlay" id="overlay">
       <h2 id="result">WIN!</h2>
       <p id="resultSub">相手を自陣へ引き込んだ</p>
-      <button id="retry">もう一度</button>
+      <p id="resultStats" style="margin:0; color:#fff; font-size:15px; font-weight:900; text-shadow:2px 2px 0 #000;"></p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center">
+        <button id="retry">もう一度</button>
+        <button id="goHome" style="background:#151313">ホームへ</button>
+      </div>
     </div>
   </section>
 
@@ -402,6 +415,43 @@ const _L1 = _RAW.filter(w => w.lv === 1);
 const _OTHERS = shuffle(_RAW.filter(w => w.lv > 1));
 const WORDS = [..._L1, ..._OTHERS.slice(0, 500 - _L1.length)].map(w => ({ ...w, tokens: tokenizeRoma(w.r) }));
 
+// ===== Shell save integration =====
+const SHELL_SAVE_KEY = 'moji-merge-shell-save-v1';
+const DEFAULT_SAVE = {
+  selectedDifficulty: 'normal',
+  settings: { fontSize: '1', shake: '1', bgm: '0.7', se: '0.8', romaji: 'hepburn', contrast: 'false' },
+  stats: { totalMatches: 0, wins: 0, bestScore: 0, bestCombo: 0 },
+  achievements: []
+};
+function loadShellSave() {
+  try { return { ...DEFAULT_SAVE, ...JSON.parse(localStorage.getItem(SHELL_SAVE_KEY) || '{}') }; }
+  catch (e) { return { ...DEFAULT_SAVE }; }
+}
+function saveShellSave(s) {
+  try { localStorage.setItem(SHELL_SAVE_KEY, JSON.stringify(s)); } catch (e) {}
+}
+const DIFFICULTY_PRESETS = {
+  easy:   { cpuSpeedInit: 0.00028, cpuSpeedBase: 0.00024, cpuSpeedRand: 0.00012, cpuSpeedLv: 0.000025, timeLimit: 60000, dangerThreshold: -0.75, label: 'Easy' },
+  normal: { cpuSpeedInit: 0.00040, cpuSpeedBase: 0.00034, cpuSpeedRand: 0.00016, cpuSpeedLv: 0.000035, timeLimit: 45000, dangerThreshold: -0.62, label: 'Normal' },
+  hard:   { cpuSpeedInit: 0.00055, cpuSpeedBase: 0.00046, cpuSpeedRand: 0.00020, cpuSpeedLv: 0.000045, timeLimit: 30000, dangerThreshold: -0.50, label: 'Hard' },
+  expert: { cpuSpeedInit: 0.00070, cpuSpeedBase: 0.00060, cpuSpeedRand: 0.00024, cpuSpeedLv: 0.000055, timeLimit: 30000, dangerThreshold: -0.40, label: 'Expert' },
+};
+const shellSave = loadShellSave();
+const PRESET = DIFFICULTY_PRESETS[shellSave.selectedDifficulty] || DIFFICULTY_PRESETS.normal;
+const TIME_LIMIT = PRESET.timeLimit;
+const DANGER_THRESHOLD = PRESET.dangerThreshold;
+const SHAKE_MULT = parseFloat(shellSave.settings && shellSave.settings.shake);
+const SHAKE_FACTOR = isNaN(SHAKE_MULT) ? 1 : SHAKE_MULT;
+const PREFER_KUNREI = (shellSave.settings && shellSave.settings.romaji) === 'kunrei';
+const HIDE_ROMA = (shellSave.settings && shellSave.settings.romaji) === 'none';
+if ((shellSave.settings && shellSave.settings.contrast) === 'true') {
+  document.body.classList.add('high-contrast');
+}
+{
+  const sub = document.getElementById('subtitle');
+  if (sub) sub.textContent = (TIME_LIMIT / 1000) + '秒勝負 ／ 難易度 ' + PRESET.label + ' ／ 打つほど味方が増える';
+}
+
 const canvas = document.getElementById('stage');
 const ctx = canvas.getContext('2d');
 const ui = {
@@ -421,7 +471,9 @@ const ui = {
   overlay: document.getElementById('overlay'),
   result: document.getElementById('result'),
   resultSub: document.getElementById('resultSub'),
+  resultStats: document.getElementById('resultStats'),
   retry: document.getElementById('retry'),
+  goHome: document.getElementById('goHome'),
   input: document.getElementById('mobileInput'),
   playerCard: document.getElementById('playerCard'),
   cpuCard: document.getElementById('cpuCard'),
@@ -463,10 +515,21 @@ function reset() {
     cpuWord: WORDS[1],
     cpuTyped: '',
     cpuProgress: 0,
-    cpuSpeed: 0.00040,
+    cpuSpeed: PRESET.cpuSpeedInit,
     rushUntil: 0,
     message: '5 COMBOで応援ラッシュ',
     messageUntil: 0,
+    metrics: {
+      totalKeys: 0,
+      correctKeys: 0,
+      errorCount: 0,
+      wordHits: { 1: 0, 2: 0, 3: 0, 4: 0 },
+      maxCombo: 0,
+      lowestRope: 0,
+      highestRope: 0,
+    },
+    finalScore: 0,
+    saved: false,
   };
   state.word = pickWord();
   state.cpuWord = pickWord();
@@ -491,6 +554,8 @@ function finishWord() {
   const rushActive = performance.now() < state.rushUntil;
   const addedPeople = lv * (rushActive ? 2 : 1);
   state.combo++;
+  if (state.combo > state.metrics.maxCombo) state.metrics.maxCombo = state.combo;
+  state.metrics.wordHits[lv] = (state.metrics.wordHits[lv] || 0) + 1;
   if (state.combo > 0 && state.combo % 5 === 0) {
     state.rushUntil = performance.now() + 4300;
     state.message = '応援ラッシュ！人数追加2倍';
@@ -533,6 +598,8 @@ function failInput() {
   state.cpuHit = 0.5;
   state.shake = 0.55;
   state.errorFlash = 400;
+  state.metrics.errorCount++;
+  state.metrics.totalKeys++;
   state.message = 'ミス！COMBOリセット';
   state.messageUntil = performance.now() + 1000;
 }
@@ -552,7 +619,7 @@ function cpuFinishWord() {
   state.cpuWord = pickWord();
   state.cpuTyped = '';
   state.cpuProgress = 0;
-  state.cpuSpeed = 0.00034 + Math.random() * 0.00016 + lv * 0.000035;
+  state.cpuSpeed = PRESET.cpuSpeedBase + Math.random() * PRESET.cpuSpeedRand + lv * PRESET.cpuSpeedLv;
 }
 
 function handleText(text) {
@@ -563,9 +630,13 @@ function handleText(text) {
   const r = checkInput(next, state.word.tokens);
   if (r === 'complete') {
     state.typed = next;
+    state.metrics.totalKeys++;
+    state.metrics.correctKeys++;
     finishWord();
   } else if (r === 'prefix') {
     state.typed = next;
+    state.metrics.totalKeys++;
+    state.metrics.correctKeys++;
     state.miniHit = 0.4;
     state.shake = Math.max(state.shake, 0.16);
     miniBurst();
@@ -607,6 +678,56 @@ function miniBurst() {
   }
 }
 
+function computeScore() {
+  const m = state.metrics;
+  let score = 0;
+  score += (m.wordHits[1] || 0) * 100;
+  score += (m.wordHits[2] || 0) * 250;
+  score += (m.wordHits[3] || 0) * 500;
+  score += (m.wordHits[4] || 0) * 1000;
+  score += m.maxCombo * 50;
+  if (state.over === 'win') score += 3000;
+  else if (state.over === 'draw') score += 1000;
+  const accuracy = m.totalKeys > 0 ? m.correctKeys / m.totalKeys : 1;
+  score = Math.round(score * (0.6 + 0.4 * accuracy));
+  return score;
+}
+
+function commitMatchResult() {
+  try {
+    const save = loadShellSave();
+    save.stats = save.stats || { totalMatches: 0, wins: 0, bestScore: 0, bestCombo: 0 };
+    save.stats.totalMatches = (save.stats.totalMatches || 0) + 1;
+    if (state.over === 'win') save.stats.wins = (save.stats.wins || 0) + 1;
+    if (state.finalScore > (save.stats.bestScore || 0)) save.stats.bestScore = state.finalScore;
+    if (state.metrics.maxCombo > (save.stats.bestCombo || 0)) save.stats.bestCombo = state.metrics.maxCombo;
+    const achievements = new Set(save.achievements || []);
+    if (state.over === 'win') achievements.add('first_win');
+    if (state.metrics.maxCombo >= 10) achievements.add('combo_10');
+    if (state.metrics.maxCombo >= 20) achievements.add('combo_20');
+    if (state.over === 'win' && state.metrics.errorCount === 0) achievements.add('perfect');
+    if (state.over === 'win' && state.metrics.lowestRope <= -0.5) achievements.add('comeback');
+    if ((state.metrics.wordHits[4] || 0) >= 3) achievements.add('lv4_killer');
+    save.achievements = Array.from(achievements);
+    save.lastScore = state.finalScore;
+    save.lastDifficulty = shellSave.selectedDifficulty;
+    save.lastResult = state.over;
+    save.lastPlayedAt = new Date().toISOString();
+    saveShellSave(save);
+  } catch (err) {}
+}
+
+function triggerGameOver(result) {
+  if (state.over) return;
+  state.over = result;
+  state.overStart = performance.now();
+  state.finalScore = computeScore();
+  if (!state.saved) {
+    commitMatchResult();
+    state.saved = true;
+  }
+}
+
 function spawnGameOverConfetti() {
   if (state.over === 'draw') return;
   const isPlayerWin = state.over === 'win';
@@ -631,7 +752,7 @@ function update() {
   const dt = Math.min(40, now - state.last);
   state.last = now;
   const elapsed = now - state.start;
-  const left = Math.max(0, 45000 - elapsed);
+  const left = Math.max(0, TIME_LIMIT - elapsed);
   if (!state.over) {
     const cpuLenFactor = 6 / Math.max(4, state.cpuWord.r.length);
     state.cpuProgress += dt * state.cpuSpeed * cpuLenFactor * (1 + state.cpuPeople * 0.012);
@@ -641,14 +762,15 @@ function update() {
     if (state.cpuProgress >= 1) cpuFinishWord();
     const force = (state.playerPeople - state.cpuPeople) * 0.000019;
     state.rope += force * dt;
-    if (state.rope > 0.62 && Math.random() < 0.012) state.hit = Math.max(state.hit, .35);
-    if (state.rope < -0.62 && Math.random() < 0.018) state.cpuHit = Math.max(state.cpuHit, .45);
-    if (state.rope >= 1) { state.over = 'win'; state.overStart = now; }
-    if (state.rope <= -1) { state.over = 'lose'; state.overStart = now; }
-    if (left <= 0 && !state.over) {
-      if (Math.abs(state.rope) < 0.05) state.over = 'draw';
-      else state.over = state.rope >= 0 ? 'win' : 'lose';
-      state.overStart = now;
+    if (state.rope < state.metrics.lowestRope) state.metrics.lowestRope = state.rope;
+    if (state.rope > state.metrics.highestRope) state.metrics.highestRope = state.rope;
+    if (state.rope > -DANGER_THRESHOLD && Math.random() < 0.012) state.hit = Math.max(state.hit, .35);
+    if (state.rope < DANGER_THRESHOLD && Math.random() < 0.018) state.cpuHit = Math.max(state.cpuHit, .45);
+    if (state.rope >= 1) triggerGameOver('win');
+    else if (state.rope <= -1) triggerGameOver('lose');
+    else if (left <= 0) {
+      if (Math.abs(state.rope) < 0.05) triggerGameOver('draw');
+      else triggerGameOver(state.rope >= 0 ? 'win' : 'lose');
     }
   } else {
     const overElapsed = now - state.overStart;
@@ -942,8 +1064,8 @@ function drawPerson(x, y, scale, dir, effort, face, fallAmount, jumpY, seed) {
 }
 
 function draw(left) {
-  const sx = state.shake ? (Math.random() - .5) * 10 * state.shake : 0;
-  const sy = state.shake ? (Math.random() - .5) * 6 * state.shake : 0;
+  const sx = state.shake ? (Math.random() - .5) * 10 * state.shake * SHAKE_FACTOR : 0;
+  const sy = state.shake ? (Math.random() - .5) * 6 * state.shake * SHAKE_FACTOR : 0;
   ctx.save();
   ctx.translate(sx, sy);
   ctx.clearRect(-20, -20, W + 40, H + 40);
@@ -1104,7 +1226,7 @@ function draw(left) {
   ctx.fillText('CPU ' + state.cpuPeople + '人', W - 24, 42);
 
   // DANGER blink
-  if (state.rope < -0.62 && !state.over) {
+  if (state.rope < DANGER_THRESHOLD && !state.over) {
     const blink = Math.floor(performance.now() / 180) % 2 === 0;
     if (blink) {
       ctx.fillStyle = 'rgba(255,16,16,0.10)';
@@ -1119,7 +1241,7 @@ function draw(left) {
     ctx.fillText('DANGER!', W / 2, 96);
   }
   // CHANCE blink
-  if (state.rope > 0.62 && !state.over) {
+  if (state.rope > -DANGER_THRESHOLD && !state.over) {
     const blink = Math.floor(performance.now() / 180) % 2 === 0;
     ctx.font = '1000 48px sans-serif';
     ctx.textAlign = 'center';
@@ -1253,8 +1375,12 @@ function renderUI(left) {
   ui.badge.textContent = 'L' + state.word.lv + ' / +' + state.word.lv + '人';
   ui.kana.textContent = state.word.k;
   ui.typed.textContent = state.typed || '_';
-  const hint = buildHint(state.typed, state.word.tokens);
-  ui.roma.innerHTML = '<span class="typed">' + state.typed + '</span>' + hint;
+  if (HIDE_ROMA) {
+    ui.roma.innerHTML = '';
+  } else {
+    const hint = buildHint(state.typed, state.word.tokens);
+    ui.roma.innerHTML = '<span class="typed">' + state.typed + '</span>' + hint;
+  }
   ui.rush.textContent = rushLeft > 0 ? '応援ラッシュ ' + (rushLeft / 1000).toFixed(1) + '秒' : (performance.now() < state.messageUntil ? state.message : '5 COMBOで応援ラッシュ');
 
   ui.cpuBadge.textContent = 'L' + state.cpuWord.lv + ' / +' + state.cpuWord.lv + '人';
@@ -1278,6 +1404,18 @@ function renderUI(left) {
       ui.result.textContent = 'DRAW';
       ui.resultSub.textContent = '時間切れ・引き分け！';
     }
+    if (ui.resultStats) {
+      const m = state.metrics;
+      const accuracy = m.totalKeys > 0 ? Math.round(m.correctKeys / m.totalKeys * 100) : 100;
+      ui.resultStats.innerHTML =
+        'Score <b style="color:#ffeb35">' + state.finalScore + '</b> ／ ' +
+        'Combo <b style="color:#ffeb35">' + m.maxCombo + '</b> ／ ' +
+        '命中率 <b style="color:#ffeb35">' + accuracy + '%</b><br>' +
+        '<span style="font-size:12px;opacity:.85">' +
+        'L1×' + (m.wordHits[1]||0) + ' L2×' + (m.wordHits[2]||0) +
+        ' L3×' + (m.wordHits[3]||0) + ' L4×' + (m.wordHits[4]||0) +
+        ' / 難易度 ' + PRESET.label + '</span>';
+    }
   }
 }
 
@@ -1296,6 +1434,11 @@ document.addEventListener('keydown', e => {
 ui.input.addEventListener('input', e => handleText(e.target.value));
 document.getElementById('app').addEventListener('pointerdown', focusInput);
 ui.retry.addEventListener('click', reset);
+if (ui.goHome) {
+  ui.goHome.addEventListener('click', () => {
+    location.href = 'moji-merge-app.html#/';
+  });
+}
 
 window.__TSUNAHIKI_DEBUG__ = {
   words: WORDS,
