@@ -10,6 +10,13 @@
 
 実装可能性の整理は [`docs/implementation-feasibility-review.md`](implementation-feasibility-review.md) を参照してください。
 
+## 重要: プレイ画面の保護方針
+
+- Claude作成のプレイ画面は `prototype/moji-merge-tsunahiki-bold-concept.html` とする。
+- Codexは、ユーザーの明示許可なくプレイ画面の見た目・ゲーム仕様・描画・ルールを変更しない。
+- Home、難易度選択、Settings、Help、Stats、Achievementsなどの非プレイ画面は `prototype/moji-merge-app.html` で作成・更新できる。
+- バックエンド、保存、ランキング、オンライン同期、API、テストはCodexの担当範囲とする。
+
 ## 現在の方向性
 
 モジマージは、現時点では「綱引き対戦タイピングゲーム」としてプロトタイプを進める。
@@ -67,17 +74,18 @@
 
 ## 現在のプロトタイプ
 
-- GitHub: `prototype/moji-merge-tsunahiki-bold-concept.html`
-- ローカル: `outputs/moji-merge-tsunahiki-bold-concept.html`
+- アプリ入口: `prototype/moji-merge-app.html`
+- Claude版プレイ画面: `prototype/moji-merge-tsunahiki-bold-concept.html`
+- ローカルプレイ画面: `outputs/moji-merge-tsunahiki-bold-concept.html`
 
 注意: GitHub上のprototypeが最新です。ローカルHTMLは同期が必要な場合があります。
 
 ## Claudeに依頼したいこと
 
-1. まず `docs/codex-implementation-spec.md` を確認する。
-2. 次に `docs/implementation-feasibility-review.md` で実装順とリスクを確認する。
-3. 現在のHTMLプロトタイプを確認し、世界観を壊さずに画面の魅力を上げる。
-4. ロープ、キャラクター、UIカード、エフェクトをよりゲームらしく磨く。
-5. 「CPUもタイピングしている」「負けそう」「応援ラッシュ中」が一目で分かる演出を強める。
-6. スマホとPCの両方で破綻しないレイアウトにする。
-7. 既存のルールは維持し、Phase 1の個人プレイ完成版へつながる改善を優先する。
+1. まず `prototype/moji-merge-tsunahiki-bold-concept.html` を確認する。
+2. 必要に応じて `prototype/moji-merge-app.html` で外側画面との接続方針を確認する。
+3. `docs/codex-implementation-spec.md` と `docs/implementation-feasibility-review.md` で実装順とリスクを確認する。
+4. プレイ画面の世界観を壊さずに魅力を上げる。
+5. ロープ、キャラクター、UIカード、エフェクトをよりゲームらしく磨く。
+6. 「CPUもタイピングしている」「負けそう」「応援ラッシュ中」が一目で分かる演出を強める。
+7. スマホとPCの両方で破綻しないレイアウトにする。
