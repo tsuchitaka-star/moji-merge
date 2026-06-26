@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>モジマージ 綱引きプロトタイプ参照</title>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Yu Gothic UI',Meiryo,sans-serif;line-height:1.8;max-width:860px;margin:40px auto;padding:0 20px;background:#fff7e7;color:#111}h1{font-size:36px}code{background:#111;color:#ffe76a;padding:2px 6px;border-radius:6px}a{font-weight:700}.note{border:4px solid #111;border-radius:12px;padding:18px;background:white}.warn{color:#d60012;font-weight:900}</style>
+</head>
+<body>
+<h1>モジマージ 綱引き対戦プロトタイプ</h1>
+<div class="note">
+<p class="warn">Claude参照用のハンドオフページです。</p>
+<p>最新の実装HTMLはローカルの <code>outputs/moji-merge-tsunahiki-bold-concept.html</code> にあります。</p>
+<p>ゲーム仕様・ルール・CPU速度・ロープ描画・単語仕様は <a href="../docs/current-gameplay-spec.md">docs/current-gameplay-spec.md</a> を参照してください。</p>
+</div>
+<h2>現在の重要仕様</h2>
+<ul>
+<li>綱引き対戦タイピングゲーム。</li>
+<li>プレイヤーとCPUが単語を打ち、完了時に人数が増える。</li>
+<li>綱引きの強さは人数に比例する。</li>
+<li>難易度L1からL4に応じて追加人数が増える。</li>
+<li>CPU側にも単語、ローマ字進捗、進捗バーを表示する。</li>
+<li>CPU速度は高速化済み。初期速度は <code>0.00040</code>。</li>
+<li>5コンボごとに応援ラッシュが発動し、人数追加が2倍。</li>
+<li>ロープは線ではなく、黒フチ付きの編み込み紐として描画する。</li>
+<li>単語は漢字混じりの意味ある単語・短文のみ、500件。</li>
+<li><code>tuchi / tuti / tsuchi</code> などのローマ字ゆれを許容する。</li>
+</ul>
+<h2>Claudeへの依頼</h2>
+<ol>
+<li>現在仕様を読み、画面の魅力を上げる。</li>
+<li>ロープ、キャラクター、UIカード、エフェクトを改善する。</li>
+<li>CPUが入力している緊張感、DANGER、応援ラッシュを分かりやすくする。</li>
+<li>スマホとPCで破綻しない見た目にする。</li>
+</ol>
+</body>
+</html>
