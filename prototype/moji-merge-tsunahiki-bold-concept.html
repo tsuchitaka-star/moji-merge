@@ -2,37 +2,878 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>モジマージ 綱引きプロトタイプ参照</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>モジマージ 綱引き - 太フチ版</title>
 <style>
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Yu Gothic UI',Meiryo,sans-serif;line-height:1.8;max-width:860px;margin:40px auto;padding:0 20px;background:#fff7e7;color:#111}h1{font-size:36px}code{background:#111;color:#ffe76a;padding:2px 6px;border-radius:6px}a{font-weight:700}.note{border:4px solid #111;border-radius:12px;padding:18px;background:white}.warn{color:#d60012;font-weight:900}</style>
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", Meiryo, sans-serif;
+  color: #111;
+  background:
+    radial-gradient(circle at 16% 12%, rgba(255,255,255,.18), transparent 22%),
+    radial-gradient(circle at 88% 34%, rgba(255,212,92,.18), transparent 26%),
+    linear-gradient(135deg, #82616d 0%, #6e5365 48%, #59485d 100%);
+  padding: 14px;
+}
+.app {
+  width: min(900px, 100%);
+  margin: 0 auto;
+}
+.title {
+  text-align: center;
+  margin: 4px 0 16px;
+  transform: rotate(-1deg);
+}
+.title h1 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(34px, 7vw, 68px);
+  line-height: .95;
+  font-weight: 1000;
+  letter-spacing: .02em;
+  -webkit-text-stroke: 8px #050505;
+  paint-order: stroke fill;
+  text-shadow: 0 6px 0 #050505, 0 14px 28px rgba(0,0,0,.32);
+}
+.title .red {
+  color: #ff1111;
+  -webkit-text-stroke: 8px #fff;
+  filter: drop-shadow(0 0 0 #000) drop-shadow(5px 5px 0 #000) drop-shadow(-5px -5px 0 #000);
+}
+.subtitle {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 5px 14px 6px;
+  background: #111;
+  color: #ffe76a;
+  border: 3px solid #fff;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 13px;
+  box-shadow: 0 5px 0 rgba(0,0,0,.35);
+}
+.hud {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.pill {
+  background: #151313;
+  border: 4px solid #fff;
+  border-radius: 14px;
+  color: #fff;
+  text-align: center;
+  padding: 7px 8px;
+  font-size: 13px;
+  font-weight: 900;
+  box-shadow: 0 5px 0 rgba(0,0,0,.36);
+}
+.pill b {
+  color: #ffeb35;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.meter {
+  height: 18px;
+  position: relative;
+  background: #171313;
+  border: 3px solid #fff;
+  border-radius: 999px;
+  margin-bottom: 18px;
+  box-shadow: 0 5px 0 rgba(0,0,0,.35);
+  overflow: hidden;
+}
+.meter-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #ff1010, #ffde2e);
+  border-radius: 999px;
+  transition: width .15s ease;
+}
+.stage-wrap {
+  position: relative;
+}
+canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 900 / 460;
+  background: transparent;
+  border: 6px solid #090909;
+  border-radius: 24px;
+  box-shadow: 0 10px 0 #090909, 0 22px 38px rgba(0,0,0,.28);
+}
+.battle-words {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.word-card {
+  margin-top: 22px;
+  padding: 17px 12px 20px;
+  background: #fff7e7;
+  border: 6px solid #080808;
+  border-radius: 22px;
+  text-align: center;
+  box-shadow: 0 9px 0 #080808, 0 20px 30px rgba(0,0,0,.22);
+  transform: rotate(.45deg);
+}
+.word-card.cpu-card {
+  background: #eef5ff;
+  transform: rotate(-.45deg);
+}
+.side-label {
+  display: inline-block;
+  margin-bottom: 4px;
+  color: #fff;
+  font-weight: 1000;
+  font-size: 18px;
+  -webkit-text-stroke: 5px #050505;
+  paint-order: stroke fill;
+}
+.cpu-progress {
+  height: 14px;
+  margin: 12px auto 0;
+  max-width: 320px;
+  border: 3px solid #050505;
+  border-radius: 999px;
+  background: #fff;
+  overflow: hidden;
+}
+.cpu-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #3d7cff, #ff3030);
+}
+.rush {
+  margin-top: 10px;
+  min-height: 28px;
+  color: #ffeb35;
+  font-size: 18px;
+  font-weight: 1000;
+  -webkit-text-stroke: 4px #050505;
+  paint-order: stroke fill;
+}
+.badge {
+  display: inline-block;
+  padding: 2px 11px;
+  border-radius: 999px;
+  border: 3px solid #fff;
+  background: #111;
+  color: #ffdf35;
+  font-weight: 900;
+  font-size: 13px;
+  box-shadow: 0 2px 0 #000;
+}
+.kana {
+  margin-top: 8px;
+  color: #fff;
+  font-size: clamp(42px, 9vw, 82px);
+  line-height: .98;
+  font-weight: 1000;
+  -webkit-text-stroke: 8px #060606;
+  paint-order: stroke fill;
+  text-shadow: 0 6px 0 #060606;
+}
+.roma {
+  margin-top: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: clamp(20px, 4vw, 30px);
+  font-weight: 1000;
+  letter-spacing: 2px;
+}
+.typed { color: #e60012; }
+.foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 16px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  text-shadow: 2px 2px 0 #000;
+}
+.hidden-input {
+  position: fixed;
+  left: -1000px;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  opacity: .01;
+}
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 14px;
+  background: rgba(20, 14, 18, .82);
+  border-radius: 18px;
+}
+.overlay h2 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(46px, 8vw, 82px);
+  font-weight: 1000;
+  -webkit-text-stroke: 8px #000;
+  paint-order: stroke fill;
+  text-shadow: 0 7px 0 #000;
+}
+.overlay p {
+  margin: 0;
+  color: #ffe76a;
+  font-size: 18px;
+  font-weight: 900;
+  text-shadow: 2px 2px 0 #000;
+}
+button {
+  appearance: none;
+  padding: 9px 24px;
+  border: 4px solid #fff;
+  border-radius: 13px;
+  background: #e60012;
+  color: #fff;
+  font: inherit;
+  font-weight: 1000;
+  cursor: pointer;
+  box-shadow: 0 6px 0 #000;
+}
+@media (max-width: 600px) {
+  body { padding: 10px; }
+  .hud { grid-template-columns: 1fr; }
+  .battle-words { grid-template-columns: 1fr; }
+  .foot { flex-direction: column; align-items: center; text-align: center; }
+  .title h1 { -webkit-text-stroke-width: 6px; }
+  .kana { -webkit-text-stroke-width: 6px; }
+}
+</style>
 </head>
 <body>
-<h1>モジマージ 綱引き対戦プロトタイプ</h1>
-<div class="note">
-<p class="warn">Claude参照用のハンドオフページです。</p>
-<p>最新の実装HTMLはローカルの <code>outputs/moji-merge-tsunahiki-bold-concept.html</code> にあります。</p>
-<p>ゲーム仕様・ルール・CPU速度・ロープ描画・単語仕様は <a href="../docs/current-gameplay-spec.md">docs/current-gameplay-spec.md</a> を参照してください。</p>
-</div>
-<h2>現在の重要仕様</h2>
-<ul>
-<li>綱引き対戦タイピングゲーム。</li>
-<li>プレイヤーとCPUが単語を打ち、完了時に人数が増える。</li>
-<li>綱引きの強さは人数に比例する。</li>
-<li>難易度L1からL4に応じて追加人数が増える。</li>
-<li>CPU側にも単語、ローマ字進捗、進捗バーを表示する。</li>
-<li>CPU速度は高速化済み。初期速度は <code>0.00040</code>。</li>
-<li>5コンボごとに応援ラッシュが発動し、人数追加が2倍。</li>
-<li>ロープは線ではなく、黒フチ付きの編み込み紐として描画する。</li>
-<li>単語は漢字混じりの意味ある単語・短文のみ、500件。</li>
-<li><code>tuchi / tuti / tsuchi</code> などのローマ字ゆれを許容する。</li>
-</ul>
-<h2>Claudeへの依頼</h2>
-<ol>
-<li>現在仕様を読み、画面の魅力を上げる。</li>
-<li>ロープ、キャラクター、UIカード、エフェクトを改善する。</li>
-<li>CPUが入力している緊張感、DANGER、応援ラッシュを分かりやすくする。</li>
-<li>スマホとPCで破綻しない見た目にする。</li>
-</ol>
+<main class="app" id="app">
+  <section class="title">
+    <h1>モジマージ<br><span class="red">綱引き！</span></h1>
+    <div class="subtitle">30秒勝負 ／ 打てば打つほど味方が増える</div>
+  </section>
+
+  <section class="hud">
+    <div class="pill">COMBO <b id="combo">0</b></div>
+    <div class="pill">YOU <b id="power">1人</b></div>
+    <div class="pill">TIME <b id="time">30.0</b></div>
+  </section>
+  <div class="meter"><div class="meter-fill" id="meter"></div></div>
+
+  <section class="stage-wrap">
+    <canvas id="stage" width="900" height="460"></canvas>
+    <div class="overlay" id="overlay">
+      <h2 id="result">WIN!</h2>
+      <p id="resultSub">相手を自陣へ引き込んだ</p>
+      <button id="retry">もう一度</button>
+    </div>
+  </section>
+
+  <section class="battle-words">
+    <div class="word-card player-card">
+      <div class="side-label">YOU</div>
+      <div class="badge" id="badge">L1</div>
+      <div class="kana" id="kana">猫</div>
+      <div class="roma" id="roma">neko</div>
+      <div class="rush" id="rush">5 COMBOで応援ラッシュ</div>
+    </div>
+    <div class="word-card cpu-card">
+      <div class="side-label">CPU</div>
+      <div class="badge" id="cpuBadge">L1</div>
+      <div class="kana" id="cpuKana">犬</div>
+      <div class="roma" id="cpuRoma">inu</div>
+      <div class="cpu-progress"><div class="cpu-progress-fill" id="cpuProgress"></div></div>
+    </div>
+  </section>
+
+  <section class="foot">
+    <div>ローマ字で入力。スマホは画面タップでキーボード表示。</div>
+    <div>Typed: <span class="typed" id="typed">_</span></div>
+  </section>
+  <input class="hidden-input" id="mobileInput" autocomplete="off" autocapitalize="none" spellcheck="false">
+</main>
+
+<script>
+const BASIC_WORDS = [
+  { k: '猫', r: 'neko', lv: 1 }, { k: '犬', r: 'inu', lv: 1 }, { k: '空', r: 'sora', lv: 1 }, { k: '山', r: 'yama', lv: 1 },
+  { k: '川', r: 'kawa', lv: 1 }, { k: '海', r: 'umi', lv: 1 }, { k: '雨', r: 'ame', lv: 1 }, { k: '風', r: 'kaze', lv: 1 },
+  { k: '月', r: 'tsuki', lv: 1 }, { k: '星', r: 'hoshi', lv: 1 }, { k: '花', r: 'hana', lv: 1 }, { k: '森', r: 'mori', lv: 1 },
+  { k: '土', r: 'tsuchi', lv: 1 }, { k: '酒', r: 'sake', lv: 1 }, { k: '夢', r: 'yume', lv: 1 }, { k: '橋', r: 'hashi', lv: 1 },
+  { k: '駅', r: 'eki', lv: 1 }, { k: '道', r: 'michi', lv: 1 }, { k: '本', r: 'hon', lv: 1 }, { k: '歌', r: 'uta', lv: 1 },
+  { k: '光', r: 'hikari', lv: 2 }, { k: '時間', r: 'jikan', lv: 2 }, { k: '言葉', r: 'kotoba', lv: 2 }, { k: '魔法', r: 'mahou', lv: 2 },
+  { k: '仲間', r: 'nakama', lv: 2 }, { k: '勝負', r: 'shoubu', lv: 2 }, { k: '作戦', r: 'sakusen', lv: 2 }, { k: '練習', r: 'renshuu', lv: 2 },
+  { k: '引力', r: 'inryoku', lv: 2 }, { k: '集中', r: 'shuuchuu', lv: 2 }, { k: '連打', r: 'renda', lv: 2 }, { k: '反撃', r: 'hangeki', lv: 2 },
+  { k: '閃き', r: 'hirameki', lv: 3 }, { k: '対決', r: 'taiketsu', lv: 3 }, { k: '応援団', r: 'ouendan', lv: 3 }, { k: '土煙', r: 'tsuchikemuri', lv: 3 },
+  { k: '大逆転', r: 'daigyakuten', lv: 4 }, { k: '言葉の力', r: 'kotobanochikara', lv: 4 }, { k: '絶対勝利', r: 'zettaishouri', lv: 4 },
+];
+
+const SEASONS = [
+  ['春', 'haru'], ['夏', 'natsu'], ['秋', 'aki'], ['冬', 'fuyu'],
+  ['朝', 'asa'], ['昼', 'hiru'], ['夕方', 'yuugata'], ['夜', 'yoru'],
+];
+const NATURE = [
+  ['空', 'sora'], ['海', 'umi'], ['山', 'yama'], ['川', 'kawa'], ['森', 'mori'], ['風', 'kaze'], ['雨', 'ame'], ['雲', 'kumo'],
+  ['月', 'tsuki'], ['星', 'hoshi'], ['花', 'hana'], ['道', 'michi'], ['光', 'hikari'], ['影', 'kage'], ['音', 'oto'], ['泉', 'izumi'],
+  ['草原', 'sougen'], ['砂浜', 'sunahama'], ['湖', 'mizuumi'], ['丘', 'oka'], ['畑', 'hatake'], ['庭', 'niwa'], ['港', 'minato'], ['街', 'machi'],
+];
+const COLORS = [
+  ['赤い', 'akai'], ['青い', 'aoi'], ['白い', 'shiroi'], ['黒い', 'kuroi'], ['丸い', 'marui'], ['小さい', 'chiisai'],
+  ['大きい', 'ookii'], ['明るい', 'akarui'], ['静かな', 'shizukana'], ['新しい', 'atarashii'], ['古い', 'furui'], ['強い', 'tsuyoi'],
+];
+const OBJECTS = [
+  ['花', 'hana'], ['傘', 'kasa'], ['靴', 'kutsu'], ['机', 'tsukue'], ['椅子', 'isu'], ['時計', 'tokei'], ['鞄', 'kaban'], ['帽子', 'boushi'],
+  ['船', 'fune'], ['車', 'kuruma'], ['電車', 'densha'], ['自転車', 'jitensha'], ['鍵', 'kagi'], ['手紙', 'tegami'], ['写真', 'shashin'], ['絵本', 'ehon'],
+  ['太鼓', 'taiko'], ['笛', 'fue'], ['旗', 'hata'], ['石', 'ishi'], ['木', 'ki'], ['紙', 'kami'], ['箱', 'hako'], ['地図', 'chizu'],
+];
+const PLACES = [
+  ['学校', 'gakkou'], ['公園', 'kouen'], ['図書館', 'toshokan'], ['駅前', 'ekimae'], ['教室', 'kyoushitsu'], ['体育館', 'taiikukan'],
+  ['商店街', 'shoutengai'], ['台所', 'daidokoro'], ['庭', 'niwa'], ['山道', 'yamamichi'], ['海辺', 'umibe'], ['川辺', 'kawabe'],
+  ['会社', 'kaisha'], ['病院', 'byouin'], ['市場', 'ichiba'], ['神社', 'jinja'], ['空港', 'kuukou'], ['港町', 'minatomachi'],
+];
+const ACTIONS = [
+  ['勉強', 'benkyou'], ['練習', 'renshuu'], ['散歩', 'sanpo'], ['読書', 'dokusho'], ['応援', 'ouen'], ['会議', 'kaigi'],
+  ['料理', 'ryouri'], ['掃除', 'souji'], ['買物', 'kaimono'], ['運動', 'undou'], ['休憩', 'kyuukei'], ['発表', 'happyou'],
+  ['相談', 'soudan'], ['準備', 'junbi'], ['確認', 'kakunin'], ['挑戦', 'chousen'], ['作戦会議', 'sakusenkaigi'], ['集中練習', 'shuuchuurenshuu'],
+];
+const GAME_NOUNS = [
+  ['味方', 'mikata'], ['相手', 'aite'], ['勝利', 'shouri'], ['作戦', 'sakusen'], ['集中力', 'shuuchuuryoku'], ['反射神経', 'hanshashinkei'],
+  ['入力速度', 'nyuuryokusokudo'], ['応援合戦', 'ouengassen'], ['最後の一手', 'saigonoitte'], ['逆転勝負', 'gyakutenshoubu'],
+];
+const GAME_VERBS = [
+  ['増える', 'fueru'], ['集まる', 'atsumaru'], ['高まる', 'takamaru'], ['光る', 'hikaru'], ['決まる', 'kimaru'],
+  ['追いつく', 'oitsuku'], ['耐える', 'taeru'], ['引き寄せる', 'hikiyoseru'], ['巻き返す', 'makikaesu'], ['勝ち切る', 'kachikiru'],
+];
+
+function pushWord(words, seen, k, r, lv) {
+  if (seen.has(k)) return;
+  seen.add(k);
+  words.push({ k, r, lv });
+}
+
+function makeWords(count = 500) {
+  const words = [];
+  const seen = new Set();
+  BASIC_WORDS.forEach(w => pushWord(words, seen, w.k, w.r, w.lv));
+  for (const [season, seasonR] of SEASONS) {
+    for (const [nature, natureR] of NATURE) {
+      pushWord(words, seen, season + 'の' + nature, seasonR + 'no' + natureR, 2);
+    }
+  }
+  for (const [color, colorR] of COLORS) {
+    for (const [object, objectR] of OBJECTS) {
+      pushWord(words, seen, color + object, colorR + objectR, 2);
+    }
+  }
+  for (const [place, placeR] of PLACES) {
+    for (const [action, actionR] of ACTIONS) {
+      pushWord(words, seen, place + 'で' + action, placeR + 'de' + actionR, actionR.length > 8 ? 4 : 3);
+    }
+  }
+  for (const [noun, nounR] of GAME_NOUNS) {
+    for (const [verb, verbR] of GAME_VERBS) {
+      pushWord(words, seen, noun + 'が' + verb, nounR + 'ga' + verbR, 4);
+    }
+  }
+  return words.slice(0, count);
+}
+
+const WORDS = makeWords(500);
+const canvas = document.getElementById('stage');
+const ctx = canvas.getContext('2d');
+const ui = {
+  combo: document.getElementById('combo'),
+  power: document.getElementById('power'),
+  time: document.getElementById('time'),
+  meter: document.getElementById('meter'),
+  badge: document.getElementById('badge'),
+  kana: document.getElementById('kana'),
+  roma: document.getElementById('roma'),
+  typed: document.getElementById('typed'),
+  rush: document.getElementById('rush'),
+  cpuBadge: document.getElementById('cpuBadge'),
+  cpuKana: document.getElementById('cpuKana'),
+  cpuRoma: document.getElementById('cpuRoma'),
+  cpuProgress: document.getElementById('cpuProgress'),
+  overlay: document.getElementById('overlay'),
+  result: document.getElementById('result'),
+  resultSub: document.getElementById('resultSub'),
+  retry: document.getElementById('retry'),
+  input: document.getElementById('mobileInput'),
+};
+
+const W = 900;
+const H = 460;
+let state;
+
+function pickWord() {
+  const maxLv = state.combo >= 10 ? 4 : state.combo >= 6 ? 3 : state.combo >= 3 ? 2 : 1;
+  const pool = WORDS.filter(w => w.lv <= maxLv);
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function reset() {
+  state = {
+    word: WORDS[0],
+    typed: '',
+    combo: 0,
+    rope: 0,
+    start: performance.now(),
+    last: performance.now(),
+    over: null,
+    hit: 0,
+    cpuHit: 0,
+    shake: 0,
+    sparks: [],
+    playerPeople: 1,
+    cpuPeople: 1,
+    cpuWord: WORDS[1],
+    cpuTyped: '',
+    cpuProgress: 0,
+    cpuSpeed: 0.00040,
+    rushUntil: 0,
+    message: '5 COMBOで応援ラッシュ',
+    messageUntil: 0,
+  };
+  state.word = pickWord();
+  state.cpuWord = pickWord();
+  ui.overlay.style.display = 'none';
+  ui.input.value = '';
+  focusInput();
+}
+
+function focusInput() {
+  ui.input.focus({ preventScroll: true });
+}
+
+function level() {
+  if (state.combo >= 10) return 4;
+  if (state.combo >= 6) return 3;
+  if (state.combo >= 3) return 2;
+  return 1;
+}
+
+function finishWord() {
+  const lv = state.word.lv;
+  const rushActive = performance.now() < state.rushUntil;
+  const addedPeople = lv * (rushActive ? 2 : 1);
+  state.combo++;
+  if (state.combo > 0 && state.combo % 5 === 0) {
+    state.rushUntil = performance.now() + 4300;
+    state.message = '応援ラッシュ！人数追加2倍';
+    state.messageUntil = performance.now() + 1600;
+  } else {
+    state.message = '+' + addedPeople + '人で引き寄せた！';
+    state.messageUntil = performance.now() + 900;
+  }
+  state.playerPeople = Math.min(60, state.playerPeople + addedPeople);
+  state.rope += 0.045 * addedPeople;
+  state.hit = 1;
+  state.shake = 1;
+  burst(260, 236, lv + addedPeople);
+  state.word = pickWord();
+  state.typed = '';
+  ui.input.value = '';
+}
+
+function failInput() {
+  state.combo = 0;
+  state.rope -= 0.055;
+  state.cpuHit = 0.7;
+  state.shake = 0.75;
+  state.message = 'ミス！コンボリセット';
+  state.messageUntil = performance.now() + 1000;
+}
+
+function cpuFinishWord() {
+  const lv = state.cpuWord.lv;
+  state.cpuPeople = Math.min(60, state.cpuPeople + lv);
+  state.rope -= 0.045 * lv;
+  state.cpuHit = 1;
+  state.shake = Math.max(state.shake, 0.65);
+  burst(640, 236, lv);
+  state.cpuWord = pickWord();
+  state.cpuTyped = '';
+  state.cpuProgress = 0;
+  state.cpuSpeed = 0.00034 + Math.random() * 0.00016 + lv * 0.000035;
+}
+
+function normalizeRomaji(value) {
+  return value.toLowerCase()
+    .replace(/xtsu|ltsu/g, 'ltu')
+    .replace(/tsu/g, 'tu')
+    .replace(/chi/g, 'ti')
+    .replace(/shi/g, 'si')
+    .replace(/fu/g, 'hu')
+    .replace(/ji/g, 'zi')
+    .replace(/jya/g, 'zya')
+    .replace(/jyu/g, 'zyu')
+    .replace(/jyo/g, 'zyo');
+}
+
+function acceptsPrefix(typed, target) {
+  const t = normalizeRomaji(typed);
+  const r = normalizeRomaji(target);
+  return r.startsWith(t) || target.startsWith(typed.toLowerCase());
+}
+
+function acceptsComplete(typed, target) {
+  return normalizeRomaji(typed) === normalizeRomaji(target) || typed.toLowerCase() === target;
+}
+function handleText(text) {
+  if (state.over) return;
+  const ch = text.slice(-1).toLowerCase();
+  if (!/^[a-z]$/.test(ch)) return;
+  const next = state.typed + ch;
+  if (acceptsPrefix(next, state.word.r) || acceptsComplete(next, state.word.r)) {
+    state.typed = next;
+    if (acceptsComplete(next, state.word.r)) finishWord();
+  } else {
+    failInput();
+    state.typed = '';
+    ui.input.value = '';
+  }
+}
+
+function burst(x, y, lv) {
+  const colors = ['#fff', '#ffde2e', '#ff1010'];
+  for (let i = 0; i < 22 + lv * 5; i++) {
+    state.sparks.push({
+      x, y,
+      vx: (Math.random() - .5) * (240 + lv * 50),
+      vy: -Math.random() * (190 + lv * 35),
+      life: 420 + Math.random() * 180,
+      age: 0,
+      r: 3 + Math.random() * 5,
+      c: colors[Math.floor(Math.random() * colors.length)],
+    });
+  }
+}
+
+function update() {
+  const now = performance.now();
+  const dt = Math.min(40, now - state.last);
+  state.last = now;
+  const elapsed = now - state.start;
+  const left = Math.max(0, 45000 - elapsed);
+  if (!state.over) {
+    const cpuLenFactor = 6 / Math.max(4, state.cpuWord.r.length);
+    state.cpuProgress += dt * state.cpuSpeed * cpuLenFactor * (1 + state.cpuPeople * 0.012);
+    const cpuLen = state.cpuWord.r.length;
+    const cpuChars = Math.min(cpuLen, Math.floor(state.cpuProgress * cpuLen));
+    state.cpuTyped = state.cpuWord.r.slice(0, cpuChars);
+    if (state.cpuProgress >= 1) cpuFinishWord();
+
+    const tugBonus = performance.now() < state.rushUntil ? 1.45 : 1;
+    const force = (state.playerPeople * tugBonus - state.cpuPeople) * 0.000019;
+    state.rope += force * dt;
+    if (state.rope > 0.62 && Math.random() < 0.012) state.hit = Math.max(state.hit, .35);
+    if (state.rope < -0.62 && Math.random() < 0.018) state.cpuHit = Math.max(state.cpuHit, .45);
+    if (state.rope >= 1) state.over = 'win';
+    if (state.rope <= -1) state.over = 'lose';
+    if (left <= 0 && !state.over) state.over = state.rope >= 0 ? 'win' : 'lose';
+  }
+  state.rope = Math.max(-1.08, Math.min(1.08, state.rope));
+  state.hit = Math.max(0, state.hit - dt / 240);
+  state.cpuHit = Math.max(0, state.cpuHit - dt / 260);
+  state.shake = Math.max(0, state.shake - dt / 260);
+  state.sparks = state.sparks.filter(p => {
+    p.age += dt;
+    p.x += p.vx * dt / 1000;
+    p.y += p.vy * dt / 1000;
+    p.vy += 480 * dt / 1000;
+    return p.age < p.life;
+  });
+  draw(left);
+  renderUI(left);
+  requestAnimationFrame(update);
+}
+
+function strokeLine(points, width, color = '#050505') {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ctx.moveTo(points[0][0], points[0][1]);
+  for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1]);
+  ctx.stroke();
+}
+
+function drawRopePath(points, width) {
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = '#050505';
+  ctx.lineWidth = width + 10;
+  ctx.beginPath();
+  ctx.moveTo(points[0][0], points[0][1]);
+  for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1]);
+  ctx.stroke();
+
+  ctx.strokeStyle = '#ead8aa';
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(points[0][0], points[0][1]);
+  for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1]);
+  ctx.stroke();
+
+  ctx.strokeStyle = '#050505';
+  ctx.lineWidth = Math.max(3, width * .22);
+  for (let i = 0; i < points.length - 1; i++) {
+    const a = points[i];
+    const b = points[i + 1];
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy);
+    if (len < 12) continue;
+    const ux = dx / len;
+    const uy = dy / len;
+    const px = -uy;
+    const py = ux;
+    for (let d = 10; d < len; d += 22) {
+      const cx = a[0] + ux * d;
+      const cy = a[1] + uy * d;
+      const slant = (i + Math.floor(d / 22)) % 2 === 0 ? 1 : -1;
+      ctx.beginPath();
+      ctx.moveTo(cx - px * width * .45 - ux * 7 * slant, cy - py * width * .45 - uy * 7 * slant);
+      ctx.lineTo(cx + px * width * .45 + ux * 7 * slant, cy + py * width * .45 + uy * 7 * slant);
+      ctx.stroke();
+    }
+  }
+
+  ctx.strokeStyle = 'rgba(255,255,255,.65)';
+  ctx.lineWidth = Math.max(2, width * .16);
+  ctx.beginPath();
+  ctx.moveTo(points[0][0], points[0][1] - width * .22);
+  for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1] - width * .22);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawBraidedRope(leftHand, center, rightHand, width) {
+  const wave = Math.sin(performance.now() / 160) * 3;
+  const leftTail = [leftHand[0] - 72, leftHand[1] + 90 + wave];
+  const leftLoose = [leftHand[0] - 42, leftHand[1] + 35 - wave];
+  const rightLoose = [rightHand[0] + 42, rightHand[1] + 35 + wave];
+  const rightTail = [rightHand[0] + 72, rightHand[1] + 90 - wave];
+  drawRopePath([leftTail, leftLoose, leftHand], width);
+  drawRopePath([leftHand, center, rightHand], width);
+  drawRopePath([rightHand, rightLoose, rightTail], width);
+
+  ctx.save();
+  ctx.fillStyle = '#e60012';
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.roundRect(center[0] - 12, center[1] - width * .55, 24, width * 1.1, 6);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+}
+function drawPerson(x, y, scale, dir, effort, face) {
+  const lean = effort * 26 * dir;
+  const headX = x + lean * .35;
+  const headY = y - 122 * scale + effort * 6;
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.fillStyle = '#fff';
+  ctx.strokeStyle = '#050505';
+  ctx.lineWidth = 9 * scale;
+  ctx.beginPath();
+  ctx.arc(headX, headY, 40 * scale, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(150,175,205,.55)';
+  ctx.beginPath();
+  ctx.ellipse(headX - 10 * dir, headY + 15 * scale, 28 * scale, 15 * scale, -.25 * dir, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#050505';
+  ctx.lineWidth = 7 * scale;
+  strokeLine([[headX - 18 * dir, headY - 20 * scale], [headX - 8 * dir, headY + 12 * scale]], 7 * scale);
+  strokeLine([[headX + 12 * dir, headY - 18 * scale], [headX + 22 * dir, headY + 10 * scale]], 7 * scale);
+  if (face === 'panic') {
+    strokeLine([[headX - 10 * dir, headY + 24 * scale], [headX + 16 * dir, headY + 16 * scale]], 5 * scale);
+  } else {
+    strokeLine([[headX - 12 * dir, headY + 20 * scale], [headX + 16 * dir, headY + 26 * scale]], 5 * scale);
+  }
+  const neck = [x + lean * .15, y - 78 * scale];
+  const hip = [x - lean * .12, y - 18 * scale];
+  strokeLine([neck, hip], 8 * scale);
+  strokeLine([hip, [x - 30 * dir, y + 48 * scale]], 8 * scale);
+  strokeLine([hip, [x + 38 * dir, y + 48 * scale]], 8 * scale);
+  const hand = [x + 56 * dir, y - 68 * scale + effort * 8];
+  strokeLine([neck, hand], 8 * scale);
+  strokeLine([[x - 2 * dir, y - 62 * scale], [hand[0] - 8 * dir, hand[1] + 16 * scale]], 8 * scale);
+  ctx.restore();
+  return hand;
+}
+
+function draw(left) {
+  const sx = state.shake ? (Math.random() - .5) * 10 * state.shake : 0;
+  const sy = state.shake ? (Math.random() - .5) * 6 * state.shake : 0;
+  ctx.save();
+  ctx.translate(sx, sy);
+  ctx.clearRect(-20, -20, W + 40, H + 40);
+  ctx.fillStyle = '#7d5e68';
+  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = 'rgba(76, 55, 65, .38)';
+  ctx.beginPath();
+  ctx.ellipse(580, 95, 210, 62, -0.26, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(170, 132, 110, .32)';
+  ctx.beginPath();
+  ctx.ellipse(185, 182, 300, 82, 0.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#7a684a';
+  ctx.fillRect(0, 350, W, 110);
+  ctx.fillStyle = '#594836';
+  for (let x = 0; x < W; x += 70) ctx.fillRect(x, 350, 4, 110);
+  ctx.strokeStyle = '#2a211d';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(0, 350);
+  ctx.lineTo(W, 350);
+  ctx.stroke();
+
+  const ropeShift = -state.rope * 150;
+  const playerBase = 210 + ropeShift;
+  const cpuBase = 690 + ropeShift;
+  const playerCount = Math.min(10, state.playerPeople);
+  const cpuCount = Math.min(10, state.cpuPeople);
+  const pEffort = .15 + state.hit * .85;
+  const cEffort = .2 + state.cpuHit * .65;
+  const pHands = [];
+  const cHands = [];
+  for (let i = playerCount - 1; i >= 0; i--) {
+    pHands.push(drawPerson(playerBase - i * 34, 316, .86, 1, i ? .15 : pEffort, state.over === 'lose' ? 'panic' : 'normal'));
+  }
+  for (let i = cpuCount - 1; i >= 0; i--) {
+    cHands.push(drawPerson(cpuBase + i * 30, 316, .78, -1, i ? .15 : cEffort, state.over === 'win' ? 'panic' : 'normal'));
+  }
+  const ropeY = 206;
+  const mx = W / 2 - state.rope * 190;
+  drawBraidedRope(pHands[0], [mx, ropeY + Math.sin(performance.now()/160)*3], cHands[0], 18);
+
+  ctx.font = '900 28px sans-serif';
+  ctx.lineWidth = 7;
+  ctx.strokeStyle = '#050505';
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'left';
+  ctx.strokeText('YOU ' + state.playerPeople + '人', 24, 42);
+  ctx.fillText('YOU ' + state.playerPeople + '人', 24, 42);
+  ctx.textAlign = 'right';
+  ctx.strokeText('CPU ' + state.cpuPeople + '人', W - 24, 42);
+  ctx.fillText('CPU ' + state.cpuPeople + '人', W - 24, 42);
+
+  if (state.rope < -0.62) {
+    ctx.font = '1000 42px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = '#fff';
+    ctx.fillStyle = '#ff1010';
+    ctx.strokeText('DANGER!', W / 2, 96);
+    ctx.fillText('DANGER!', W / 2, 96);
+  }
+  if (performance.now() < state.rushUntil) {
+    ctx.font = '1000 38px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.lineWidth = 7;
+    ctx.strokeStyle = '#050505';
+    ctx.fillStyle = '#ffeb35';
+    ctx.strokeText('応援ラッシュ', W / 2, 132);
+    ctx.fillText('応援ラッシュ', W / 2, 132);
+  }
+  if (state.hit > .25) {
+    ctx.font = '1000 48px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = '#fff';
+    ctx.fillStyle = '#e60012';
+    ctx.strokeText('グイッ！', 326, 112);
+    ctx.fillText('グイッ！', 326, 112);
+  }
+  for (const p of state.sparks) {
+    const a = 1 - p.age / p.life;
+    ctx.globalAlpha = a;
+    ctx.fillStyle = p.c;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
+function renderUI(left) {
+  const rushLeft = Math.max(0, state.rushUntil - performance.now());
+  ui.combo.textContent = state.combo;
+  ui.power.textContent = state.playerPeople + '人';
+  ui.time.textContent = (left / 1000).toFixed(1);
+  ui.time.style.color = left < 8000 ? '#ff3030' : '#ffeb35';
+  ui.meter.style.width = Math.min(100, Math.abs(state.rope) * 100) + '%';
+  ui.meter.style.background = state.rope >= 0 ? 'linear-gradient(90deg, #ff1010, #ffde2e)' : 'linear-gradient(90deg, #3d7cff, #ff3030)';
+  ui.badge.textContent = 'L' + state.word.lv + ' / +' + state.word.lv + '人';
+  ui.kana.textContent = state.word.k;
+  ui.typed.textContent = state.typed || '_';
+  const shownRoma = state.word.r.startsWith(state.typed.toLowerCase()) ? state.word.r : normalizeRomaji(state.word.r);
+  const shownTyped = state.word.r.startsWith(state.typed.toLowerCase()) ? state.typed : normalizeRomaji(state.typed);
+  const rest = acceptsPrefix(state.typed, state.word.r) ? shownRoma.slice(Math.min(shownTyped.length, shownRoma.length)) : shownRoma;
+  ui.roma.innerHTML = '<span class="typed">' + state.typed + '</span>' + rest;
+  ui.rush.textContent = rushLeft > 0 ? '応援ラッシュ ' + (rushLeft / 1000).toFixed(1) + '秒' : (performance.now() < state.messageUntil ? state.message : '5 COMBOで応援ラッシュ');
+
+  ui.cpuBadge.textContent = 'L' + state.cpuWord.lv + ' / +' + state.cpuWord.lv + '人';
+  ui.cpuKana.textContent = state.cpuWord.k;
+  ui.cpuRoma.innerHTML = '<span class="typed">' + state.cpuTyped + '</span>' + state.cpuWord.r.slice(state.cpuTyped.length);
+  ui.cpuProgress.style.width = Math.min(100, state.cpuProgress * 100) + '%';
+  if (state.over) {
+    ui.overlay.style.display = 'flex';
+    ui.result.textContent = state.over === 'win' ? 'WIN!' : 'LOSE...';
+    ui.resultSub.textContent = state.over === 'win' ? '相手を自陣へ引き込んだ' : '相手陣へ引き込まれた。もう一回！';
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Backspace') {
+    state.typed = '';
+    ui.input.value = '';
+    e.preventDefault();
+    return;
+  }
+  if (/^[a-zA-Z]$/.test(e.key)) {
+    handleText(e.key);
+    e.preventDefault();
+  }
+});
+ui.input.addEventListener('input', e => handleText(e.target.value));
+document.getElementById('app').addEventListener('pointerdown', focusInput);
+ui.retry.addEventListener('click', reset);
+
+window.__TSUNAHIKI_DEBUG__ = {
+  words: WORDS,
+  normalizeRomaji,
+  acceptsPrefix,
+  acceptsComplete,
+  getState: () => ({
+    combo: state.combo,
+    rope: state.rope,
+    playerPeople: state.playerPeople,
+    cpuPeople: state.cpuPeople,
+    word: state.word,
+    typed: state.typed,
+    over: state.over,
+    cpuWord: state.cpuWord,
+    cpuTyped: state.cpuTyped,
+    cpuProgress: state.cpuProgress,
+  }),
+};
+reset();
+requestAnimationFrame(update);
+</script>
 </body>
 </html>
