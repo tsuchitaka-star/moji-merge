@@ -800,7 +800,7 @@ function drawRopePath(points, width, glowing) {
   ctx.restore();
 }
 
-function drawBraidedRope(leftHand, rightHand, ropeState, tension, width, extraSag, glowing) {
+function drawBraidedRope(leftHand, rightHand, ropeState, tension, width, extraSag, glowing, markerX, markerY) {
   const midX = (leftHand[0] + rightHand[0]) / 2;
   const midY = (leftHand[1] + rightHand[1]) / 2;
   const sag = 14 - tension * 10 + (extraSag || 0);
@@ -823,18 +823,8 @@ function drawBraidedRope(leftHand, rightHand, ropeState, tension, width, extraSa
   drawRopePath(leftTailPoints, width * 0.78, glowing);
   drawRopePath(rightTailPoints, width * 0.78, glowing);
   drawRopePath(points, width, glowing);
-  const ropeRange = (rightHand[0] - leftHand[0]) * 0.42;
-  const markerWorldX = (leftHand[0] + rightHand[0]) / 2 - ropeState * ropeRange;
-  let bestT = 0.5, bestDist = Infinity;
-  for (let t = 0; t <= 1; t += 0.02) {
-    const u = 1 - t;
-    const px = u * u * leftHand[0] + 2 * u * t * midX + t * t * rightHand[0];
-    const d = Math.abs(px - markerWorldX);
-    if (d < bestDist) { bestDist = d; bestT = t; }
-  }
-  const u = 1 - bestT;
-  const mx = u * u * leftHand[0] + 2 * u * bestT * midX + bestT * bestT * rightHand[0];
-  const my = u * u * leftHand[1] + 2 * u * bestT * controlY + bestT * bestT * rightHand[1];
+  const mx = markerX;
+  const my = markerY;
   ctx.save();
   ctx.fillStyle = '#e60012';
   ctx.strokeStyle = '#fff';
@@ -1086,10 +1076,19 @@ function draw(left) {
     ctx.strokeText('+' + cpuExtra, cpuBase + (cpuDisplay - 1) * 28 + 26, 296);
     ctx.fillText('+' + cpuExtra, cpuBase + (cpuDisplay - 1) * 28 + 26, 296);
   }
-  // rope (with golden glow during rush)
+  // rope (with golden glow during rush) — marker uses stable score-driven position only
   if (pHands[0] && cHands[0]) {
     const extraSag = state.over ? Math.min(60, overElapsed / 16) : 0;
-    drawBraidedRope(pHands[0], cHands[0], state.rope, Math.max(pEffort, cEffort), 20, extraSag, rushActive);
+    const tension = Math.max(pEffort, cEffort);
+    const stableLeftX = playerBase + 56 * 0.82;
+    const stableRightX = cpuBase - 56 * 0.76;
+    const stableMidX = (stableLeftX + stableRightX) / 2;
+    const stableRange = (stableRightX - stableLeftX) * 0.42;
+    const markerX = stableMidX - state.rope * stableRange;
+    const stableSag = 14 - tension * 10;
+    const sagFactor = 1 - state.rope * state.rope;
+    const markerY = 260 + stableSag * sagFactor + extraSag * 0.5;
+    drawBraidedRope(pHands[0], cHands[0], state.rope, tension, 20, extraSag, rushActive, markerX, markerY);
   }
 
   // labels
