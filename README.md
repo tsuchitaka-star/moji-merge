@@ -16,6 +16,13 @@
 - 5コンボごとに「応援ラッシュ」が発動し、人数追加が2倍になる
 - ロープは線ではなく、編み込みと余り紐のある太い紐として描画する
 
+## 画面構成
+
+- アプリ入口 / 非プレイ画面: [`prototype/moji-merge-app.html`](prototype/moji-merge-app.html)
+- Claude作成のプレイ画面: [`prototype/moji-merge-tsunahiki-bold-concept.html`](prototype/moji-merge-tsunahiki-bold-concept.html)
+
+重要: プレイ画面の見た目・ゲーム仕様はClaude作成版を維持します。Codex側はホーム、設定、統計、実績、保存、API、ランキング、オンライン同期など、プレイ画面外または裏側の処理を担当します。
+
 ## 最新仕様
 
 実装時の優先参照順は以下です。
@@ -26,7 +33,7 @@
 4. グラフィック制作仕様: [`docs/graphic-spec-for-claude.md`](docs/graphic-spec-for-claude.md)
 5. オンライン環境仕様: [`docs/online-environment.md`](docs/online-environment.md)
 
-`docs/codex-implementation-spec.md` は、単一HTMLプロトタイプを公開可能なWeb/PWAゲームへ移行するための本実装仕様です。`current-gameplay-spec.md` と差分が出た場合は、`codex-implementation-spec.md` を優先します。
+`docs/codex-implementation-spec.md` は、単一HTMLプロトタイプを公開可能なWeb/PWAゲームへ移行するための本実装仕様です。`current-gameplay-spec.md` と差分が出た場合は、`codex-implementation-spec.md` を優先します。ただし、プレイ画面のデザイン・挙動はClaude作成版を勝手に変更しません。
 
 ## Notion
 
@@ -47,10 +54,11 @@ src/          本実装
 
 ## Claudeに参照してほしいもの
 
-1. `docs/codex-implementation-spec.md`
-2. `docs/implementation-feasibility-review.md`
-3. `prototype/moji-merge-tsunahiki-bold-concept.html`
-4. `docs/current-gameplay-spec.md`
-5. `docs/graphic-spec-for-claude.md`
+1. `prototype/moji-merge-tsunahiki-bold-concept.html`
+2. `prototype/moji-merge-app.html`
+3. `docs/codex-implementation-spec.md`
+4. `docs/implementation-feasibility-review.md`
+5. `docs/current-gameplay-spec.md`
+6. `docs/graphic-spec-for-claude.md`
 
-まずは現在の綱引き対戦プロトタイプの魅力を保ちながら、Phase 1の個人プレイ完成版へ移行します。
+まずはClaude版プレイ画面の魅力を保ちながら、ホーム・設定・保存・統計などの外側を整えます。
