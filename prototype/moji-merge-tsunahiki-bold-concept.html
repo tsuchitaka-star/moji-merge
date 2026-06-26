@@ -255,13 +255,13 @@ button {
 <main class="app" id="app">
   <section class="title">
     <h1>モジマージ<br><span class="red">綱引き！</span></h1>
-    <div class="subtitle">30秒勝負 ／ 打てば打つほど味方が増える</div>
+    <div class="subtitle">45秒勝負 ／ 打てば打つほど味方が増える</div>
   </section>
 
   <section class="hud">
     <div class="pill">COMBO <b id="combo">0</b></div>
     <div class="pill">YOU <b id="power">1人</b></div>
-    <div class="pill">TIME <b id="time">30.0</b></div>
+    <div class="pill">TIME <b id="time">45.0</b></div>
   </section>
   <div class="meter"><div class="meter-fill" id="meter"></div></div>
 
@@ -355,7 +355,7 @@ function pushWord(words, seen, k, r, lv) {
   words.push({ k, r, lv });
 }
 
-function makeWords(count = 500) {
+function makeWords(count) {
   const words = [];
   const seen = new Set();
   BASIC_WORDS.forEach(w => pushWord(words, seen, w.k, w.r, w.lv));
@@ -382,7 +382,125 @@ function makeWords(count = 500) {
   return words.slice(0, count);
 }
 
-const WORDS = makeWords(500);
+const SYLLABLE_VARIANTS = {
+  'a':['a'],'i':['i'],'u':['u'],'e':['e'],'o':['o'],
+  'ka':['ka'],'ki':['ki'],'ku':['ku'],'ke':['ke'],'ko':['ko'],
+  'ga':['ga'],'gi':['gi'],'gu':['gu'],'ge':['ge'],'go':['go'],
+  'sa':['sa'],'shi':['shi','si'],'si':['shi','si'],'su':['su'],'se':['se'],'so':['so'],
+  'za':['za'],'ji':['ji','zi'],'zi':['ji','zi'],'zu':['zu'],'ze':['ze'],'zo':['zo'],
+  'ta':['ta'],'chi':['chi','ti'],'ti':['chi','ti'],'tsu':['tsu','tu'],'tu':['tsu','tu'],'te':['te'],'to':['to'],
+  'da':['da'],'de':['de'],'do':['do'],
+  'na':['na'],'ni':['ni'],'nu':['nu'],'ne':['ne'],'no':['no'],
+  'ha':['ha'],'hi':['hi'],'fu':['fu','hu'],'hu':['fu','hu'],'he':['he'],'ho':['ho'],
+  'ba':['ba'],'bi':['bi'],'bu':['bu'],'be':['be'],'bo':['bo'],
+  'pa':['pa'],'pi':['pi'],'pu':['pu'],'pe':['pe'],'po':['po'],
+  'ma':['ma'],'mi':['mi'],'mu':['mu'],'me':['me'],'mo':['mo'],
+  'ya':['ya'],'yu':['yu'],'yo':['yo'],
+  'ra':['ra'],'ri':['ri'],'ru':['ru'],'re':['re'],'ro':['ro'],
+  'wa':['wa'],'wo':['wo','o'],
+  'kya':['kya'],'kyu':['kyu'],'kyo':['kyo'],
+  'gya':['gya'],'gyu':['gyu'],'gyo':['gyo'],
+  'sha':['sha','sya'],'sya':['sha','sya'],
+  'shu':['shu','syu'],'syu':['shu','syu'],
+  'sho':['sho','syo'],'syo':['sho','syo'],
+  'ja':['ja','jya','zya'],'jya':['ja','jya','zya'],'zya':['ja','jya','zya'],
+  'ju':['ju','jyu','zyu'],'jyu':['ju','jyu','zyu'],'zyu':['ju','jyu','zyu'],
+  'jo':['jo','jyo','zyo'],'jyo':['jo','jyo','zyo'],'zyo':['jo','jyo','zyo'],
+  'cha':['cha','tya','cya'],'tya':['cha','tya','cya'],'cya':['cha','tya','cya'],
+  'chu':['chu','tyu','cyu'],'tyu':['chu','tyu','cyu'],'cyu':['chu','tyu','cyu'],
+  'cho':['cho','tyo','cyo'],'tyo':['cho','tyo','cyo'],'cyo':['cho','tyo','cyo'],
+  'nya':['nya'],'nyu':['nyu'],'nyo':['nyo'],
+  'hya':['hya'],'hyu':['hyu'],'hyo':['hyo'],
+  'bya':['bya'],'byu':['byu'],'byo':['byo'],
+  'pya':['pya'],'pyu':['pyu'],'pyo':['pyo'],
+  'mya':['mya'],'myu':['myu'],'myo':['myo'],
+  'rya':['rya'],'ryu':['ryu'],'ryo':['ryo'],
+};
+
+function tokenizeRoma(roma) {
+  const tokens = [];
+  const VOWELS = 'aiueoy';
+  let i = 0;
+  while (i < roma.length) {
+    const c = roma[i];
+    if (i + 1 < roma.length && c === roma[i+1] && !VOWELS.includes(c) && c !== 'n') {
+      tokens.push([c]);
+      i++;
+      continue;
+    }
+    const c3 = roma.slice(i, i+3);
+    if (SYLLABLE_VARIANTS[c3]) {
+      tokens.push(SYLLABLE_VARIANTS[c3]);
+      i += 3;
+      continue;
+    }
+    const c2 = roma.slice(i, i+2);
+    if (SYLLABLE_VARIANTS[c2]) {
+      tokens.push(SYLLABLE_VARIANTS[c2]);
+      i += 2;
+      continue;
+    }
+    if (c === 'n') {
+      tokens.push(['n','nn']);
+      i++;
+      continue;
+    }
+    if (SYLLABLE_VARIANTS[c]) {
+      tokens.push(SYLLABLE_VARIANTS[c]);
+      i++;
+      continue;
+    }
+    tokens.push([c]);
+    i++;
+  }
+  return tokens;
+}
+
+function checkInput(typed, tokens, idx) {
+  idx = idx || 0;
+  if (typed === '' && idx >= tokens.length) return 'complete';
+  if (idx >= tokens.length) return 'invalid';
+  if (typed === '') return 'prefix';
+  let canPrefix = false;
+  for (const opt of tokens[idx]) {
+    if (typed.startsWith(opt)) {
+      const r = checkInput(typed.slice(opt.length), tokens, idx + 1);
+      if (r === 'complete') return 'complete';
+      if (r === 'prefix') canPrefix = true;
+    } else if (opt.startsWith(typed)) {
+      canPrefix = true;
+    }
+  }
+  return canPrefix ? 'prefix' : 'invalid';
+}
+
+function buildHint(typed, tokens) {
+  let consumed = 0, rest = typed;
+  outer: while (consumed < tokens.length && rest.length > 0) {
+    for (const opt of tokens[consumed]) {
+      if (rest.startsWith(opt)) {
+        rest = rest.slice(opt.length);
+        consumed++;
+        continue outer;
+      }
+    }
+    break;
+  }
+  let hint = '';
+  if (rest.length > 0 && consumed < tokens.length) {
+    for (const opt of tokens[consumed]) {
+      if (opt.startsWith(rest)) {
+        hint = opt.slice(rest.length);
+        consumed++;
+        break;
+      }
+    }
+  }
+  hint += tokens.slice(consumed).map(t => t[0]).join('');
+  return hint;
+}
+
+const WORDS = makeWords(500).map(w => ({ ...w, tokens: tokenizeRoma(w.r) }));
 const canvas = document.getElementById('stage');
 const ctx = canvas.getContext('2d');
 const ui = {
@@ -482,10 +600,9 @@ function finishWord() {
 
 function failInput() {
   state.combo = 0;
-  state.rope -= 0.055;
-  state.cpuHit = 0.7;
-  state.shake = 0.75;
-  state.message = 'ミス！コンボリセット';
+  state.cpuHit = 0.5;
+  state.shake = 0.55;
+  state.message = 'ミス！COMBOリセット';
   state.messageUntil = performance.now() + 1000;
 }
 
@@ -502,36 +619,17 @@ function cpuFinishWord() {
   state.cpuSpeed = 0.00034 + Math.random() * 0.00016 + lv * 0.000035;
 }
 
-function normalizeRomaji(value) {
-  return value.toLowerCase()
-    .replace(/xtsu|ltsu/g, 'ltu')
-    .replace(/tsu/g, 'tu')
-    .replace(/chi/g, 'ti')
-    .replace(/shi/g, 'si')
-    .replace(/fu/g, 'hu')
-    .replace(/ji/g, 'zi')
-    .replace(/jya/g, 'zya')
-    .replace(/jyu/g, 'zyu')
-    .replace(/jyo/g, 'zyo');
-}
-
-function acceptsPrefix(typed, target) {
-  const t = normalizeRomaji(typed);
-  const r = normalizeRomaji(target);
-  return r.startsWith(t) || target.startsWith(typed.toLowerCase());
-}
-
-function acceptsComplete(typed, target) {
-  return normalizeRomaji(typed) === normalizeRomaji(target) || typed.toLowerCase() === target;
-}
 function handleText(text) {
   if (state.over) return;
   const ch = text.slice(-1).toLowerCase();
   if (!/^[a-z]$/.test(ch)) return;
   const next = state.typed + ch;
-  if (acceptsPrefix(next, state.word.r) || acceptsComplete(next, state.word.r)) {
+  const r = checkInput(next, state.word.tokens);
+  if (r === 'complete') {
     state.typed = next;
-    if (acceptsComplete(next, state.word.r)) finishWord();
+    finishWord();
+  } else if (r === 'prefix') {
+    state.typed = next;
   } else {
     failInput();
     state.typed = '';
@@ -568,14 +666,16 @@ function update() {
     state.cpuTyped = state.cpuWord.r.slice(0, cpuChars);
     if (state.cpuProgress >= 1) cpuFinishWord();
 
-    const tugBonus = performance.now() < state.rushUntil ? 1.45 : 1;
-    const force = (state.playerPeople * tugBonus - state.cpuPeople) * 0.000019;
+    const force = (state.playerPeople - state.cpuPeople) * 0.000019;
     state.rope += force * dt;
     if (state.rope > 0.62 && Math.random() < 0.012) state.hit = Math.max(state.hit, .35);
     if (state.rope < -0.62 && Math.random() < 0.018) state.cpuHit = Math.max(state.cpuHit, .45);
     if (state.rope >= 1) state.over = 'win';
     if (state.rope <= -1) state.over = 'lose';
-    if (left <= 0 && !state.over) state.over = state.rope >= 0 ? 'win' : 'lose';
+    if (left <= 0 && !state.over) {
+      if (Math.abs(state.rope) < 0.05) state.over = 'draw';
+      else state.over = state.rope >= 0 ? 'win' : 'lose';
+    }
   }
   state.rope = Math.max(-1.08, Math.min(1.08, state.rope));
   state.hit = Math.max(0, state.hit - dt / 240);
@@ -593,8 +693,8 @@ function update() {
   requestAnimationFrame(update);
 }
 
-function strokeLine(points, width, color = '#050505') {
-  ctx.strokeStyle = color;
+function strokeLine(points, width, color) {
+  ctx.strokeStyle = color || '#050505';
   ctx.lineWidth = width;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
@@ -604,77 +704,169 @@ function strokeLine(points, width, color = '#050505') {
   ctx.stroke();
 }
 
+function curvePoints(p1, ctl, p2, steps) {
+  const points = [];
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const u = 1 - t;
+    points.push([
+      u * u * p1[0] + 2 * u * t * ctl[0] + t * t * p2[0],
+      u * u * p1[1] + 2 * u * t * ctl[1] + t * t * p2[1]
+    ]);
+  }
+  return points;
+}
+
 function drawRopePath(points, width) {
+  if (points.length < 2) return;
   ctx.save();
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
+  // outline
   ctx.strokeStyle = '#050505';
-  ctx.lineWidth = width + 10;
+  ctx.lineWidth = width + 8;
   ctx.beginPath();
   ctx.moveTo(points[0][0], points[0][1]);
   for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1]);
   ctx.stroke();
-
-  ctx.strokeStyle = '#ead8aa';
+  // body
+  ctx.strokeStyle = '#d8b97c';
   ctx.lineWidth = width;
   ctx.beginPath();
   ctx.moveTo(points[0][0], points[0][1]);
   for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1]);
   ctx.stroke();
-
-  ctx.strokeStyle = '#050505';
-  ctx.lineWidth = Math.max(3, width * .22);
+  // shadow band on lower side
+  ctx.strokeStyle = 'rgba(90,60,20,0.45)';
+  ctx.lineWidth = Math.max(2, width * 0.25);
+  ctx.beginPath();
+  for (let i = 0; i < points.length; i++) {
+    const p = points[i];
+    let nx = 0, ny = 1;
+    if (i < points.length - 1) {
+      const np = points[i+1];
+      const dx = np[0] - p[0];
+      const dy = np[1] - p[1];
+      const len = Math.hypot(dx, dy);
+      if (len > 0.01) { nx = dy/len; ny = -dx/len; }
+    }
+    const ox = p[0] - nx * width * 0.22;
+    const oy = p[1] - ny * width * 0.22;
+    if (i === 0) ctx.moveTo(ox, oy);
+    else ctx.lineTo(ox, oy);
+  }
+  ctx.stroke();
+  // braided chevrons
+  ctx.strokeStyle = '#5a3c20';
+  ctx.lineWidth = Math.max(2.2, width * 0.18);
+  const spacing = 13;
+  let acc = 0;
   for (let i = 0; i < points.length - 1; i++) {
     const a = points[i];
     const b = points[i + 1];
     const dx = b[0] - a[0];
     const dy = b[1] - a[1];
     const len = Math.hypot(dx, dy);
-    if (len < 12) continue;
-    const ux = dx / len;
-    const uy = dy / len;
-    const px = -uy;
-    const py = ux;
-    for (let d = 10; d < len; d += 22) {
-      const cx = a[0] + ux * d;
-      const cy = a[1] + uy * d;
-      const slant = (i + Math.floor(d / 22)) % 2 === 0 ? 1 : -1;
+    if (len < 0.01) continue;
+    const ux = dx / len, uy = dy / len;
+    const nx = -uy, ny = ux;
+    let pos = spacing - (acc % spacing);
+    while (pos < len) {
+      const cx = a[0] + ux * pos;
+      const cy = a[1] + uy * pos;
+      const half = width * 0.42;
       ctx.beginPath();
-      ctx.moveTo(cx - px * width * .45 - ux * 7 * slant, cy - py * width * .45 - uy * 7 * slant);
-      ctx.lineTo(cx + px * width * .45 + ux * 7 * slant, cy + py * width * .45 + uy * 7 * slant);
+      ctx.moveTo(cx + nx * half - ux * 5, cy + ny * half - uy * 5);
+      ctx.lineTo(cx + ux * 4, cy + uy * 4);
+      ctx.lineTo(cx - nx * half - ux * 5, cy - ny * half - uy * 5);
       ctx.stroke();
+      pos += spacing;
     }
+    acc += len;
   }
-
-  ctx.strokeStyle = 'rgba(255,255,255,.65)';
-  ctx.lineWidth = Math.max(2, width * .16);
+  // highlight strip on upper side
+  ctx.strokeStyle = 'rgba(255,245,210,0.55)';
+  ctx.lineWidth = Math.max(2, width * 0.16);
   ctx.beginPath();
-  ctx.moveTo(points[0][0], points[0][1] - width * .22);
-  for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1] - width * .22);
+  for (let i = 0; i < points.length; i++) {
+    const p = points[i];
+    let nx = 0, ny = -1;
+    if (i < points.length - 1) {
+      const np = points[i+1];
+      const dx = np[0] - p[0];
+      const dy = np[1] - p[1];
+      const len = Math.hypot(dx, dy);
+      if (len > 0.01) { nx = dy/len; ny = -dx/len; }
+    }
+    const ox = p[0] + nx * width * 0.22;
+    const oy = p[1] + ny * width * 0.22;
+    if (i === 0) ctx.moveTo(ox, oy);
+    else ctx.lineTo(ox, oy);
+  }
   ctx.stroke();
   ctx.restore();
 }
 
-function drawBraidedRope(leftHand, center, rightHand, width) {
-  const wave = Math.sin(performance.now() / 160) * 3;
-  const leftTail = [leftHand[0] - 72, leftHand[1] + 90 + wave];
-  const leftLoose = [leftHand[0] - 42, leftHand[1] + 35 - wave];
-  const rightLoose = [rightHand[0] + 42, rightHand[1] + 35 + wave];
-  const rightTail = [rightHand[0] + 72, rightHand[1] + 90 - wave];
-  drawRopePath([leftTail, leftLoose, leftHand], width);
-  drawRopePath([leftHand, center, rightHand], width);
-  drawRopePath([rightHand, rightLoose, rightTail], width);
-
+function drawBraidedRope(leftHand, rightHand, ropeState, tension, width) {
+  const midX = (leftHand[0] + rightHand[0]) / 2;
+  const midY = (leftHand[1] + rightHand[1]) / 2;
+  const sag = 14 - tension * 10;
+  const wave = Math.sin(performance.now() / 160) * (1 + (1 - tension) * 2);
+  const controlY = midY + sag * 2 + wave;
+  const points = curvePoints(leftHand, [midX, controlY], rightHand, 30);
+  // dangling tails
+  const tailWave = Math.sin(performance.now() / 180) * 4;
+  const leftTailPoints = curvePoints(
+    leftHand,
+    [leftHand[0] - 32, leftHand[1] + 56],
+    [leftHand[0] - 76, leftHand[1] + 102 + tailWave],
+    15
+  );
+  const rightTailPoints = curvePoints(
+    rightHand,
+    [rightHand[0] + 32, rightHand[1] + 56],
+    [rightHand[0] + 76, rightHand[1] + 102 - tailWave],
+    15
+  );
+  drawRopePath(leftTailPoints, width * 0.78);
+  drawRopePath(rightTailPoints, width * 0.78);
+  drawRopePath(points, width);
+  // central red marker (knot)
+  const ropeRange = (rightHand[0] - leftHand[0]) * 0.42;
+  const markerWorldX = (leftHand[0] + rightHand[0]) / 2 - ropeState * ropeRange;
+  let bestT = 0.5, bestDist = Infinity;
+  for (let t = 0; t <= 1; t += 0.02) {
+    const u = 1 - t;
+    const px = u * u * leftHand[0] + 2 * u * t * midX + t * t * rightHand[0];
+    const d = Math.abs(px - markerWorldX);
+    if (d < bestDist) { bestDist = d; bestT = t; }
+  }
+  const u = 1 - bestT;
+  const mx = u * u * leftHand[0] + 2 * u * bestT * midX + bestT * bestT * rightHand[0];
+  const my = u * u * leftHand[1] + 2 * u * bestT * controlY + bestT * bestT * rightHand[1];
   ctx.save();
   ctx.fillStyle = '#e60012';
   ctx.strokeStyle = '#fff';
   ctx.lineWidth = 5;
   ctx.beginPath();
-  ctx.roundRect(center[0] - 12, center[1] - width * .55, 24, width * 1.1, 6);
+  ctx.roundRect(mx - 14, my - width * 0.6, 28, width * 1.2, 6);
+  ctx.fill();
+  ctx.stroke();
+  // hanging ribbon
+  ctx.fillStyle = '#e60012';
+  ctx.strokeStyle = '#050505';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(mx - 7, my + width * 0.45);
+  ctx.lineTo(mx - 12, my + width * 0.45 + 20);
+  ctx.lineTo(mx + 12, my + width * 0.45 + 20);
+  ctx.lineTo(mx + 7, my + width * 0.45);
+  ctx.closePath();
   ctx.fill();
   ctx.stroke();
   ctx.restore();
 }
+
 function drawPerson(x, y, scale, dir, effort, face) {
   const lean = effort * 26 * dir;
   const headX = x + lean * .35;
@@ -682,6 +874,7 @@ function drawPerson(x, y, scale, dir, effort, face) {
   ctx.save();
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
+  // head outline
   ctx.fillStyle = '#fff';
   ctx.strokeStyle = '#050505';
   ctx.lineWidth = 9 * scale;
@@ -689,24 +882,62 @@ function drawPerson(x, y, scale, dir, effort, face) {
   ctx.arc(headX, headY, 40 * scale, 0, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
-  ctx.fillStyle = 'rgba(150,175,205,.55)';
+  // eyes: black dots
+  ctx.fillStyle = '#050505';
+  const eyeOffsetY = -4 * scale;
   ctx.beginPath();
-  ctx.ellipse(headX - 10 * dir, headY + 15 * scale, 28 * scale, 15 * scale, -.25 * dir, 0, Math.PI * 2);
+  ctx.arc(headX - 14 * scale, headY + eyeOffsetY, 5.5 * scale, 0, Math.PI * 2);
+  ctx.arc(headX + 14 * scale, headY + eyeOffsetY, 5.5 * scale, 0, Math.PI * 2);
   ctx.fill();
-  ctx.strokeStyle = '#050505';
-  ctx.lineWidth = 7 * scale;
-  strokeLine([[headX - 18 * dir, headY - 20 * scale], [headX - 8 * dir, headY + 12 * scale]], 7 * scale);
-  strokeLine([[headX + 12 * dir, headY - 18 * scale], [headX + 22 * dir, headY + 10 * scale]], 7 * scale);
-  if (face === 'panic') {
-    strokeLine([[headX - 10 * dir, headY + 24 * scale], [headX + 16 * dir, headY + 16 * scale]], 5 * scale);
-  } else {
-    strokeLine([[headX - 12 * dir, headY + 20 * scale], [headX + 16 * dir, headY + 26 * scale]], 5 * scale);
+  // eyebrows during effort
+  if (effort > 0.4) {
+    ctx.strokeStyle = '#050505';
+    ctx.lineWidth = 4 * scale;
+    ctx.beginPath();
+    ctx.moveTo(headX - 22 * scale, headY - 17 * scale);
+    ctx.lineTo(headX - 7 * scale, headY - 11 * scale);
+    ctx.moveTo(headX + 22 * scale, headY - 17 * scale);
+    ctx.lineTo(headX + 7 * scale, headY - 11 * scale);
+    ctx.stroke();
   }
+  // mouth: face state
+  ctx.strokeStyle = '#050505';
+  ctx.lineWidth = 5 * scale;
+  if (face === 'panic') {
+    // round panic mouth
+    ctx.fillStyle = '#050505';
+    ctx.beginPath();
+    ctx.ellipse(headX, headY + 18 * scale, 7 * scale, 9 * scale, 0, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (effort > 0.55) {
+    // gritted teeth zigzag
+    ctx.beginPath();
+    const baseY = headY + 18 * scale;
+    ctx.moveTo(headX - 16 * scale, baseY);
+    ctx.lineTo(headX - 9 * scale, baseY + 5 * scale);
+    ctx.lineTo(headX - 3 * scale, baseY);
+    ctx.lineTo(headX + 4 * scale, baseY + 5 * scale);
+    ctx.lineTo(headX + 11 * scale, baseY);
+    ctx.lineTo(headX + 17 * scale, baseY + 5 * scale);
+    ctx.stroke();
+  } else {
+    // determined mouth: short line
+    ctx.beginPath();
+    ctx.moveTo(headX - 11 * scale, headY + 20 * scale);
+    ctx.lineTo(headX + 11 * scale, headY + 20 * scale);
+    ctx.stroke();
+  }
+  // body
   const neck = [x + lean * .15, y - 78 * scale];
   const hip = [x - lean * .12, y - 18 * scale];
+  ctx.strokeStyle = '#050505';
   strokeLine([neck, hip], 8 * scale);
-  strokeLine([hip, [x - 30 * dir, y + 48 * scale]], 8 * scale);
-  strokeLine([hip, [x + 38 * dir, y + 48 * scale]], 8 * scale);
+  // legs: braced stance for effort
+  const frontFoot = [x + 38 * dir, y + 48 * scale];
+  const backFoot = [x - 36 * dir, y + 48 * scale + (effort > 0.4 ? 4 : 0)];
+  strokeLine([hip, frontFoot], 8 * scale);
+  strokeLine([hip, backFoot], 8 * scale);
+  // arms reaching forward to rope
   const hand = [x + 56 * dir, y - 68 * scale + effort * 8];
   strokeLine([neck, hand], 8 * scale);
   strokeLine([[x - 2 * dir, y - 62 * scale], [hand[0] - 8 * dir, hand[1] + 16 * scale]], 8 * scale);
@@ -720,8 +951,10 @@ function draw(left) {
   ctx.save();
   ctx.translate(sx, sy);
   ctx.clearRect(-20, -20, W + 40, H + 40);
+  // sky
   ctx.fillStyle = '#7d5e68';
   ctx.fillRect(0, 0, W, H);
+  // ambient clouds
   ctx.fillStyle = 'rgba(76, 55, 65, .38)';
   ctx.beginPath();
   ctx.ellipse(580, 95, 210, 62, -0.26, 0, Math.PI * 2);
@@ -730,36 +963,92 @@ function draw(left) {
   ctx.beginPath();
   ctx.ellipse(185, 182, 300, 82, 0.2, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = '#7a684a';
+  // wood floor base
+  ctx.fillStyle = '#8a6a4c';
   ctx.fillRect(0, 350, W, 110);
-  ctx.fillStyle = '#594836';
-  for (let x = 0; x < W; x += 70) ctx.fillRect(x, 350, 4, 110);
-  ctx.strokeStyle = '#2a211d';
+  // horizontal grain
+  ctx.strokeStyle = 'rgba(82,55,30,0.55)';
+  ctx.lineWidth = 1.2;
+  for (let y = 358; y < H; y += 11) {
+    ctx.beginPath();
+    for (let x = 0; x <= W; x += 18) {
+      const variance = Math.sin(x * 0.028 + y * 0.13) * 1.6 + Math.sin(x * 0.011 - y * 0.07) * 0.8;
+      if (x === 0) ctx.moveTo(x, y + variance);
+      else ctx.lineTo(x, y + variance);
+    }
+    ctx.stroke();
+  }
+  // plank seams
+  ctx.strokeStyle = '#3d2a1a';
+  ctx.lineWidth = 2.5;
+  for (let x = 120; x < W; x += 180) {
+    ctx.beginPath();
+    ctx.moveTo(x, 350);
+    ctx.lineTo(x, H);
+    ctx.stroke();
+  }
+  // knots
+  ctx.fillStyle = '#5a3c1f';
+  ctx.strokeStyle = '#2a1812';
+  ctx.lineWidth = 1.5;
+  const knots = [[160, 388], [380, 412], [620, 384], [780, 415], [70, 405]];
+  for (const [kx, ky] of knots) {
+    ctx.beginPath();
+    ctx.ellipse(kx, ky, 7, 4.5, 0.3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  }
+  // ground top edge
+  ctx.strokeStyle = '#2a1812';
   ctx.lineWidth = 4;
   ctx.beginPath();
-  ctx.moveTo(0, 350);
-  ctx.lineTo(W, 350);
+  ctx.moveTo(0, 350); ctx.lineTo(W, 350);
   ctx.stroke();
 
-  const ropeShift = -state.rope * 150;
+  // positions (clamp ropeShift so teams stay on canvas)
+  const ropeShift = Math.max(-110, Math.min(110, -state.rope * 110));
   const playerBase = 210 + ropeShift;
   const cpuBase = 690 + ropeShift;
-  const playerCount = Math.min(10, state.playerPeople);
-  const cpuCount = Math.min(10, state.cpuPeople);
+  const playerDisplay = Math.min(6, state.playerPeople);
+  const cpuDisplay = Math.min(6, state.cpuPeople);
+  const playerExtra = Math.max(0, state.playerPeople - playerDisplay);
+  const cpuExtra = Math.max(0, state.cpuPeople - cpuDisplay);
   const pEffort = .15 + state.hit * .85;
   const cEffort = .2 + state.cpuHit * .65;
   const pHands = [];
   const cHands = [];
-  for (let i = playerCount - 1; i >= 0; i--) {
-    pHands.push(drawPerson(playerBase - i * 34, 316, .86, 1, i ? .15 : pEffort, state.over === 'lose' ? 'panic' : 'normal'));
+  for (let i = playerDisplay - 1; i >= 0; i--) {
+    pHands.push(drawPerson(playerBase - i * 30, 316, .82, 1, i ? .15 : pEffort, state.over === 'lose' ? 'panic' : 'normal'));
   }
-  for (let i = cpuCount - 1; i >= 0; i--) {
-    cHands.push(drawPerson(cpuBase + i * 30, 316, .78, -1, i ? .15 : cEffort, state.over === 'win' ? 'panic' : 'normal'));
+  for (let i = cpuDisplay - 1; i >= 0; i--) {
+    cHands.push(drawPerson(cpuBase + i * 28, 316, .76, -1, i ? .15 : cEffort, state.over === 'win' ? 'panic' : 'normal'));
   }
-  const ropeY = 206;
-  const mx = W / 2 - state.rope * 190;
-  drawBraidedRope(pHands[0], [mx, ropeY + Math.sin(performance.now()/160)*3], cHands[0], 18);
+  // extras badge
+  if (playerExtra > 0) {
+    ctx.fillStyle = '#ffeb35';
+    ctx.strokeStyle = '#050505';
+    ctx.lineWidth = 5;
+    ctx.font = '900 24px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.strokeText('+' + playerExtra, playerBase - (playerDisplay - 1) * 30 - 26, 296);
+    ctx.fillText('+' + playerExtra, playerBase - (playerDisplay - 1) * 30 - 26, 296);
+  }
+  if (cpuExtra > 0) {
+    ctx.fillStyle = '#9fd0ff';
+    ctx.strokeStyle = '#050505';
+    ctx.lineWidth = 5;
+    ctx.font = '900 24px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.strokeText('+' + cpuExtra, cpuBase + (cpuDisplay - 1) * 28 + 26, 296);
+    ctx.fillText('+' + cpuExtra, cpuBase + (cpuDisplay - 1) * 28 + 26, 296);
+  }
+  // rope
+  const tension = Math.max(pEffort, cEffort);
+  if (pHands[0] && cHands[0]) {
+    drawBraidedRope(pHands[0], cHands[0], state.rope, tension, 20);
+  }
 
+  // people count labels
   ctx.font = '900 28px sans-serif';
   ctx.lineWidth = 7;
   ctx.strokeStyle = '#050505';
@@ -771,6 +1060,7 @@ function draw(left) {
   ctx.strokeText('CPU ' + state.cpuPeople + '人', W - 24, 42);
   ctx.fillText('CPU ' + state.cpuPeople + '人', W - 24, 42);
 
+  // DANGER (player losing)
   if (state.rope < -0.62) {
     ctx.font = '1000 42px sans-serif';
     ctx.textAlign = 'center';
@@ -780,6 +1070,17 @@ function draw(left) {
     ctx.strokeText('DANGER!', W / 2, 96);
     ctx.fillText('DANGER!', W / 2, 96);
   }
+  // CHANCE (player winning)
+  if (state.rope > 0.62) {
+    ctx.font = '1000 42px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = '#fff';
+    ctx.fillStyle = '#3d7cff';
+    ctx.strokeText('CHANCE!', W / 2, 96);
+    ctx.fillText('CHANCE!', W / 2, 96);
+  }
+  // 応援ラッシュ
   if (performance.now() < state.rushUntil) {
     ctx.font = '1000 38px sans-serif';
     ctx.textAlign = 'center';
@@ -789,6 +1090,7 @@ function draw(left) {
     ctx.strokeText('応援ラッシュ', W / 2, 132);
     ctx.fillText('応援ラッシュ', W / 2, 132);
   }
+  // pull-success burst text
   if (state.hit > .25) {
     ctx.font = '1000 48px sans-serif';
     ctx.textAlign = 'center';
@@ -798,6 +1100,16 @@ function draw(left) {
     ctx.strokeText('グイッ！', 326, 112);
     ctx.fillText('グイッ！', 326, 112);
   }
+  if (state.cpuHit > .35) {
+    ctx.font = '1000 36px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.lineWidth = 7;
+    ctx.strokeStyle = '#fff';
+    ctx.fillStyle = '#3d7cff';
+    ctx.strokeText('ぐぬぬ！', 580, 112);
+    ctx.fillText('ぐぬぬ！', 580, 112);
+  }
+  // particles
   for (const p of state.sparks) {
     const a = 1 - p.age / p.life;
     ctx.globalAlpha = a;
@@ -821,10 +1133,8 @@ function renderUI(left) {
   ui.badge.textContent = 'L' + state.word.lv + ' / +' + state.word.lv + '人';
   ui.kana.textContent = state.word.k;
   ui.typed.textContent = state.typed || '_';
-  const shownRoma = state.word.r.startsWith(state.typed.toLowerCase()) ? state.word.r : normalizeRomaji(state.word.r);
-  const shownTyped = state.word.r.startsWith(state.typed.toLowerCase()) ? state.typed : normalizeRomaji(state.typed);
-  const rest = acceptsPrefix(state.typed, state.word.r) ? shownRoma.slice(Math.min(shownTyped.length, shownRoma.length)) : shownRoma;
-  ui.roma.innerHTML = '<span class="typed">' + state.typed + '</span>' + rest;
+  const hint = buildHint(state.typed, state.word.tokens);
+  ui.roma.innerHTML = '<span class="typed">' + state.typed + '</span>' + hint;
   ui.rush.textContent = rushLeft > 0 ? '応援ラッシュ ' + (rushLeft / 1000).toFixed(1) + '秒' : (performance.now() < state.messageUntil ? state.message : '5 COMBOで応援ラッシュ');
 
   ui.cpuBadge.textContent = 'L' + state.cpuWord.lv + ' / +' + state.cpuWord.lv + '人';
@@ -833,8 +1143,16 @@ function renderUI(left) {
   ui.cpuProgress.style.width = Math.min(100, state.cpuProgress * 100) + '%';
   if (state.over) {
     ui.overlay.style.display = 'flex';
-    ui.result.textContent = state.over === 'win' ? 'WIN!' : 'LOSE...';
-    ui.resultSub.textContent = state.over === 'win' ? '相手を自陣へ引き込んだ' : '相手陣へ引き込まれた。もう一回！';
+    if (state.over === 'win') {
+      ui.result.textContent = 'WIN!';
+      ui.resultSub.textContent = '相手を自陣へ引き込んだ';
+    } else if (state.over === 'lose') {
+      ui.result.textContent = 'LOSE...';
+      ui.resultSub.textContent = '相手陣へ引き込まれた。もう一回！';
+    } else {
+      ui.result.textContent = 'DRAW';
+      ui.resultSub.textContent = '時間切れ・引き分け！';
+    }
   }
 }
 
@@ -856,9 +1174,9 @@ ui.retry.addEventListener('click', reset);
 
 window.__TSUNAHIKI_DEBUG__ = {
   words: WORDS,
-  normalizeRomaji,
-  acceptsPrefix,
-  acceptsComplete,
+  tokenizeRoma,
+  checkInput,
+  buildHint,
   getState: () => ({
     combo: state.combo,
     rope: state.rope,
