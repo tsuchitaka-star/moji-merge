@@ -2,6 +2,14 @@
 
 更新日: 2026-06-26
 
+## 重要: 参照優先度
+
+実装時は [`docs/codex-implementation-spec.md`](codex-implementation-spec.md) を Source of Truth とする。
+
+この `current-gameplay-spec.md` は、現在のプロトタイプのルール・見た目・Claude向け共有メモをまとめた補助資料です。画面構成、リリース優先度、データモデル、PWA、オンライン対戦、テスト方針などの本実装判断は `codex-implementation-spec.md` を優先します。
+
+実装可能性の整理は [`docs/implementation-feasibility-review.md`](implementation-feasibility-review.md) を参照してください。
+
 ## 現在の方向性
 
 モジマージは、現時点では「綱引き対戦タイピングゲーム」としてプロトタイプを進める。
@@ -62,10 +70,14 @@
 - GitHub: `prototype/moji-merge-tsunahiki-bold-concept.html`
 - ローカル: `outputs/moji-merge-tsunahiki-bold-concept.html`
 
+注意: GitHub上のprototypeが最新です。ローカルHTMLは同期が必要な場合があります。
+
 ## Claudeに依頼したいこと
 
-1. 現在のHTMLプロトタイプを確認し、世界観を壊さずに画面の魅力を上げる。
-2. ロープ、キャラクター、UIカード、エフェクトをよりゲームらしく磨く。
-3. 「CPUもタイピングしている」「負けそう」「応援ラッシュ中」が一目で分かる演出を強める。
-4. スマホとPCの両方で破綻しないレイアウトにする。
-5. 既存のルールは維持し、見た目と体験の改善を優先する。
+1. まず `docs/codex-implementation-spec.md` を確認する。
+2. 次に `docs/implementation-feasibility-review.md` で実装順とリスクを確認する。
+3. 現在のHTMLプロトタイプを確認し、世界観を壊さずに画面の魅力を上げる。
+4. ロープ、キャラクター、UIカード、エフェクトをよりゲームらしく磨く。
+5. 「CPUもタイピングしている」「負けそう」「応援ラッシュ中」が一目で分かる演出を強める。
+6. スマホとPCの両方で破綻しないレイアウトにする。
+7. 既存のルールは維持し、Phase 1の個人プレイ完成版へつながる改善を優先する。
