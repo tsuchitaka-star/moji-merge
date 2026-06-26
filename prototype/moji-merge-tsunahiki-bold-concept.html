@@ -16,24 +16,13 @@ body {
     linear-gradient(135deg, #82616d 0%, #6e5365 48%, #59485d 100%);
   padding: 14px;
 }
-.app {
-  width: min(900px, 100%);
-  margin: 0 auto;
-}
-.title {
-  text-align: center;
-  margin: 4px 0 16px;
-  transform: rotate(-1deg);
-}
+.app { width: min(900px, 100%); margin: 0 auto; }
+.title { text-align: center; margin: 4px 0 16px; transform: rotate(-1deg); }
 .title h1 {
-  margin: 0;
-  color: #fff;
+  margin: 0; color: #fff;
   font-size: clamp(34px, 7vw, 68px);
-  line-height: .95;
-  font-weight: 1000;
-  letter-spacing: .02em;
-  -webkit-text-stroke: 8px #050505;
-  paint-order: stroke fill;
+  line-height: .95; font-weight: 1000; letter-spacing: .02em;
+  -webkit-text-stroke: 8px #050505; paint-order: stroke fill;
   text-shadow: 0 6px 0 #050505, 0 14px 28px rgba(0,0,0,.32);
 }
 .title .red {
@@ -42,203 +31,125 @@ body {
   filter: drop-shadow(0 0 0 #000) drop-shadow(5px 5px 0 #000) drop-shadow(-5px -5px 0 #000);
 }
 .subtitle {
-  display: inline-block;
-  margin-top: 12px;
-  padding: 5px 14px 6px;
-  background: #111;
-  color: #ffe76a;
-  border: 3px solid #fff;
-  border-radius: 999px;
-  font-weight: 900;
-  font-size: 13px;
+  display: inline-block; margin-top: 12px;
+  padding: 5px 14px 6px; background: #111; color: #ffe76a;
+  border: 3px solid #fff; border-radius: 999px;
+  font-weight: 900; font-size: 13px;
   box-shadow: 0 5px 0 rgba(0,0,0,.35);
 }
-.hud {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 10px;
-}
+.hud { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
 .pill {
-  background: #151313;
-  border: 4px solid #fff;
-  border-radius: 14px;
-  color: #fff;
-  text-align: center;
-  padding: 7px 8px;
-  font-size: 13px;
-  font-weight: 900;
+  background: #151313; border: 4px solid #fff; border-radius: 14px;
+  color: #fff; text-align: center; padding: 7px 8px;
+  font-size: 13px; font-weight: 900;
   box-shadow: 0 5px 0 rgba(0,0,0,.36);
 }
-.pill b {
-  color: #ffeb35;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-}
+.pill b { color: #ffeb35; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 .meter {
-  height: 18px;
-  position: relative;
-  background: #171313;
-  border: 3px solid #fff;
-  border-radius: 999px;
-  margin-bottom: 18px;
-  box-shadow: 0 5px 0 rgba(0,0,0,.35);
-  overflow: hidden;
+  height: 18px; position: relative; background: #171313;
+  border: 3px solid #fff; border-radius: 999px;
+  margin-bottom: 18px; box-shadow: 0 5px 0 rgba(0,0,0,.35); overflow: hidden;
 }
 .meter-fill {
-  width: 0%;
-  height: 100%;
+  width: 0%; height: 100%;
   background: linear-gradient(90deg, #ff1010, #ffde2e);
-  border-radius: 999px;
-  transition: width .15s ease;
+  border-radius: 999px; transition: width .15s ease;
 }
-.stage-wrap {
-  position: relative;
-}
+.stage-wrap { position: relative; }
 canvas {
-  display: block;
-  width: 100%;
-  aspect-ratio: 900 / 460;
-  background: transparent;
-  border: 6px solid #090909;
-  border-radius: 24px;
+  display: block; width: 100%; aspect-ratio: 900 / 460;
+  background: transparent; border: 6px solid #090909; border-radius: 24px;
   box-shadow: 0 10px 0 #090909, 0 22px 38px rgba(0,0,0,.28);
 }
-.battle-words {
-  margin-top: 22px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
+.battle-words { margin-top: 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .word-card {
-  margin-top: 22px;
-  padding: 17px 12px 20px;
-  background: #fff7e7;
-  border: 6px solid #080808;
-  border-radius: 22px;
+  margin-top: 22px; padding: 17px 12px 20px;
+  background: #fff7e7; border: 6px solid #080808; border-radius: 22px;
   text-align: center;
   box-shadow: 0 9px 0 #080808, 0 20px 30px rgba(0,0,0,.22);
   transform: rotate(.45deg);
+  transition: background-color .2s, border-color .2s;
 }
-.word-card.cpu-card {
-  background: #eef5ff;
-  transform: rotate(-.45deg);
+.word-card.cpu-card { background: #eef5ff; transform: rotate(-.45deg); }
+.word-card.lv2 { background: #d8e8fb; border-color: #08358a; box-shadow: 0 9px 0 #08358a, 0 20px 30px rgba(24,95,165,.25); }
+.word-card.cpu-card.lv2 { background: #d8e8fb; border-color: #08358a; box-shadow: 0 9px 0 #08358a, 0 20px 30px rgba(24,95,165,.25); }
+.word-card.lv3 { background: #ffe1c0; border-color: #c4530a; box-shadow: 0 9px 0 #c4530a, 0 20px 30px rgba(196,83,10,.28); }
+.word-card.cpu-card.lv3 { background: #ffe1c0; border-color: #c4530a; box-shadow: 0 9px 0 #c4530a, 0 20px 30px rgba(196,83,10,.28); }
+.word-card.lv4 { background: #ffd0d6; border-color: #c00a1e; box-shadow: 0 9px 0 #c00a1e, 0 20px 30px rgba(255,0,40,.32); animation: lvl4Throb 1.3s infinite; }
+.word-card.cpu-card.lv4 { background: #ffd0d6; border-color: #c00a1e; box-shadow: 0 9px 0 #c00a1e, 0 20px 30px rgba(255,0,40,.32); animation: lvl4ThrobCpu 1.3s infinite; }
+@keyframes lvl4Throb {
+  0%, 100% { transform: rotate(.45deg) scale(1); }
+  50% { transform: rotate(-.5deg) scale(1.02); }
+}
+@keyframes lvl4ThrobCpu {
+  0%, 100% { transform: rotate(-.45deg) scale(1); }
+  50% { transform: rotate(.5deg) scale(1.02); }
+}
+.word-card.cpu-card.almost { animation: cpuAlmost .42s infinite alternate; }
+@keyframes cpuAlmost {
+  0% { border-color: currentBorder; }
+  100% { border-color: #ff1010; box-shadow: 0 9px 0 #c00a1e, 0 0 22px rgba(255,30,30,.5); }
 }
 .side-label {
-  display: inline-block;
-  margin-bottom: 4px;
-  color: #fff;
-  font-weight: 1000;
-  font-size: 18px;
-  -webkit-text-stroke: 5px #050505;
-  paint-order: stroke fill;
+  display: inline-block; margin-bottom: 4px;
+  color: #fff; font-weight: 1000; font-size: 18px;
+  -webkit-text-stroke: 5px #050505; paint-order: stroke fill;
 }
 .cpu-progress {
-  height: 14px;
-  margin: 12px auto 0;
-  max-width: 320px;
-  border: 3px solid #050505;
-  border-radius: 999px;
-  background: #fff;
-  overflow: hidden;
+  height: 14px; margin: 12px auto 0; max-width: 320px;
+  border: 3px solid #050505; border-radius: 999px;
+  background: #fff; overflow: hidden;
 }
 .cpu-progress-fill {
-  height: 100%;
-  width: 0%;
+  height: 100%; width: 0%;
   background: linear-gradient(90deg, #3d7cff, #ff3030);
 }
 .rush {
-  margin-top: 10px;
-  min-height: 28px;
-  color: #ffeb35;
-  font-size: 18px;
-  font-weight: 1000;
-  -webkit-text-stroke: 4px #050505;
-  paint-order: stroke fill;
+  margin-top: 10px; min-height: 28px;
+  color: #ffeb35; font-size: 18px; font-weight: 1000;
+  -webkit-text-stroke: 4px #050505; paint-order: stroke fill;
 }
 .badge {
-  display: inline-block;
-  padding: 2px 11px;
-  border-radius: 999px;
-  border: 3px solid #fff;
-  background: #111;
-  color: #ffdf35;
-  font-weight: 900;
-  font-size: 13px;
+  display: inline-block; padding: 2px 11px; border-radius: 999px;
+  border: 3px solid #fff; background: #111;
+  color: #ffdf35; font-weight: 900; font-size: 13px;
   box-shadow: 0 2px 0 #000;
 }
 .kana {
-  margin-top: 8px;
-  color: #fff;
-  font-size: clamp(42px, 9vw, 82px);
-  line-height: .98;
-  font-weight: 1000;
-  -webkit-text-stroke: 8px #060606;
-  paint-order: stroke fill;
+  margin-top: 8px; color: #fff;
+  font-size: clamp(42px, 9vw, 82px); line-height: .98; font-weight: 1000;
+  -webkit-text-stroke: 8px #060606; paint-order: stroke fill;
   text-shadow: 0 6px 0 #060606;
 }
 .roma {
   margin-top: 12px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: clamp(20px, 4vw, 30px);
-  font-weight: 1000;
-  letter-spacing: 2px;
+  font-size: clamp(20px, 4vw, 30px); font-weight: 1000; letter-spacing: 2px;
 }
 .typed { color: #e60012; }
 .foot {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 16px;
-  color: #fff;
-  font-size: 12px;
-  font-weight: 900;
+  display: flex; justify-content: space-between; gap: 10px;
+  margin-top: 16px; color: #fff;
+  font-size: 12px; font-weight: 900;
   text-shadow: 2px 2px 0 #000;
 }
-.hidden-input {
-  position: fixed;
-  left: -1000px;
-  top: 0;
-  width: 1px;
-  height: 1px;
-  opacity: .01;
-}
+.hidden-input { position: fixed; left: -1000px; top: 0; width: 1px; height: 1px; opacity: .01; }
 .overlay {
-  position: absolute;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 14px;
-  background: rgba(20, 14, 18, .82);
-  border-radius: 18px;
+  position: absolute; inset: 0; display: none;
+  align-items: center; justify-content: center; flex-direction: column; gap: 14px;
+  background: rgba(20, 14, 18, .82); border-radius: 18px;
 }
 .overlay h2 {
-  margin: 0;
-  color: #fff;
-  font-size: clamp(46px, 8vw, 82px);
-  font-weight: 1000;
-  -webkit-text-stroke: 8px #000;
-  paint-order: stroke fill;
+  margin: 0; color: #fff;
+  font-size: clamp(46px, 8vw, 82px); font-weight: 1000;
+  -webkit-text-stroke: 8px #000; paint-order: stroke fill;
   text-shadow: 0 7px 0 #000;
 }
-.overlay p {
-  margin: 0;
-  color: #ffe76a;
-  font-size: 18px;
-  font-weight: 900;
-  text-shadow: 2px 2px 0 #000;
-}
+.overlay p { margin: 0; color: #ffe76a; font-size: 18px; font-weight: 900; text-shadow: 2px 2px 0 #000; }
 button {
-  appearance: none;
-  padding: 9px 24px;
-  border: 4px solid #fff;
-  border-radius: 13px;
-  background: #e60012;
-  color: #fff;
-  font: inherit;
-  font-weight: 1000;
-  cursor: pointer;
+  appearance: none; padding: 9px 24px;
+  border: 4px solid #fff; border-radius: 13px; background: #e60012;
+  color: #fff; font: inherit; font-weight: 1000; cursor: pointer;
   box-shadow: 0 6px 0 #000;
 }
 @media (max-width: 600px) {
@@ -275,14 +186,14 @@ button {
   </section>
 
   <section class="battle-words">
-    <div class="word-card player-card">
+    <div class="word-card player-card" id="playerCard">
       <div class="side-label">YOU</div>
       <div class="badge" id="badge">L1</div>
       <div class="kana" id="kana">猫</div>
       <div class="roma" id="roma">neko</div>
       <div class="rush" id="rush">5 COMBOで応援ラッシュ</div>
     </div>
-    <div class="word-card cpu-card">
+    <div class="word-card cpu-card" id="cpuCard">
       <div class="side-label">CPU</div>
       <div class="badge" id="cpuBadge">L1</div>
       <div class="kana" id="cpuKana">犬</div>
@@ -355,7 +266,7 @@ function pushWord(words, seen, k, r, lv) {
   words.push({ k, r, lv });
 }
 
-function makeWords(count) {
+function makeWords() {
   const words = [];
   const seen = new Set();
   BASIC_WORDS.forEach(w => pushWord(words, seen, w.k, w.r, w.lv));
@@ -379,7 +290,16 @@ function makeWords(count) {
       pushWord(words, seen, noun + 'が' + verb, nounR + 'ga' + verbR, 4);
     }
   }
-  return words.slice(0, count);
+  return words;
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
 const SYLLABLE_VARIANTS = {
@@ -424,34 +344,15 @@ function tokenizeRoma(roma) {
   while (i < roma.length) {
     const c = roma[i];
     if (i + 1 < roma.length && c === roma[i+1] && !VOWELS.includes(c) && c !== 'n') {
-      tokens.push([c]);
-      i++;
-      continue;
+      tokens.push([c]); i++; continue;
     }
     const c3 = roma.slice(i, i+3);
-    if (SYLLABLE_VARIANTS[c3]) {
-      tokens.push(SYLLABLE_VARIANTS[c3]);
-      i += 3;
-      continue;
-    }
+    if (SYLLABLE_VARIANTS[c3]) { tokens.push(SYLLABLE_VARIANTS[c3]); i += 3; continue; }
     const c2 = roma.slice(i, i+2);
-    if (SYLLABLE_VARIANTS[c2]) {
-      tokens.push(SYLLABLE_VARIANTS[c2]);
-      i += 2;
-      continue;
-    }
-    if (c === 'n') {
-      tokens.push(['n','nn']);
-      i++;
-      continue;
-    }
-    if (SYLLABLE_VARIANTS[c]) {
-      tokens.push(SYLLABLE_VARIANTS[c]);
-      i++;
-      continue;
-    }
-    tokens.push([c]);
-    i++;
+    if (SYLLABLE_VARIANTS[c2]) { tokens.push(SYLLABLE_VARIANTS[c2]); i += 2; continue; }
+    if (c === 'n') { tokens.push(['n','nn']); i++; continue; }
+    if (SYLLABLE_VARIANTS[c]) { tokens.push(SYLLABLE_VARIANTS[c]); i++; continue; }
+    tokens.push([c]); i++;
   }
   return tokens;
 }
@@ -489,18 +390,18 @@ function buildHint(typed, tokens) {
   let hint = '';
   if (rest.length > 0 && consumed < tokens.length) {
     for (const opt of tokens[consumed]) {
-      if (opt.startsWith(rest)) {
-        hint = opt.slice(rest.length);
-        consumed++;
-        break;
-      }
+      if (opt.startsWith(rest)) { hint = opt.slice(rest.length); consumed++; break; }
     }
   }
   hint += tokens.slice(consumed).map(t => t[0]).join('');
   return hint;
 }
 
-const WORDS = makeWords(500).map(w => ({ ...w, tokens: tokenizeRoma(w.r) }));
+const _RAW = makeWords();
+const _L1 = _RAW.filter(w => w.lv === 1);
+const _OTHERS = shuffle(_RAW.filter(w => w.lv > 1));
+const WORDS = [..._L1, ..._OTHERS.slice(0, 500 - _L1.length)].map(w => ({ ...w, tokens: tokenizeRoma(w.r) }));
+
 const canvas = document.getElementById('stage');
 const ctx = canvas.getContext('2d');
 const ui = {
@@ -522,6 +423,8 @@ const ui = {
   resultSub: document.getElementById('resultSub'),
   retry: document.getElementById('retry'),
   input: document.getElementById('mobileInput'),
+  playerCard: document.getElementById('playerCard'),
+  cpuCard: document.getElementById('cpuCard'),
 };
 
 const W = 900;
@@ -534,6 +437,8 @@ function pickWord() {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
+function choice(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
 function reset() {
   state = {
     word: WORDS[0],
@@ -543,10 +448,16 @@ function reset() {
     start: performance.now(),
     last: performance.now(),
     over: null,
+    overStart: 0,
+    confettiSpawned: false,
     hit: 0,
     cpuHit: 0,
+    miniHit: 0,
     shake: 0,
     sparks: [],
+    confetti: [],
+    cheers: [],
+    errorFlash: 0,
     playerPeople: 1,
     cpuPeople: 1,
     cpuWord: WORDS[1],
@@ -584,6 +495,20 @@ function finishWord() {
     state.rushUntil = performance.now() + 4300;
     state.message = '応援ラッシュ！人数追加2倍';
     state.messageUntil = performance.now() + 1600;
+    // big celebration confetti
+    for (let i = 0; i < 60; i++) {
+      state.confetti.push({
+        x: 100 + Math.random() * 700,
+        y: 40 + Math.random() * 60,
+        vx: (Math.random() - 0.5) * 120,
+        vy: 30 + Math.random() * 80,
+        rot: Math.random() * Math.PI * 2,
+        spin: (Math.random() - 0.5) * 7,
+        color: ['#ffeb35','#ff8a40','#ff1010','#fff','#ffde2e','#ffb830'][Math.floor(Math.random() * 6)],
+        life: 2400, age: 0,
+        w: 5 + Math.random() * 7, h: 7 + Math.random() * 7,
+      });
+    }
   } else {
     state.message = '+' + addedPeople + '人で引き寄せた！';
     state.messageUntil = performance.now() + 900;
@@ -593,6 +518,11 @@ function finishWord() {
   state.hit = 1;
   state.shake = 1;
   burst(260, 236, lv + addedPeople);
+  state.cheers.push({
+    x: 210, y: 215,
+    text: choice(['オーエス！', 'えい！', 'よし！', 'せいっ！', 'ヨイショ！']),
+    age: 0, maxAge: 720, color: '#ffeb35',
+  });
   state.word = pickWord();
   state.typed = '';
   ui.input.value = '';
@@ -602,6 +532,7 @@ function failInput() {
   state.combo = 0;
   state.cpuHit = 0.5;
   state.shake = 0.55;
+  state.errorFlash = 400;
   state.message = 'ミス！COMBOリセット';
   state.messageUntil = performance.now() + 1000;
 }
@@ -613,6 +544,11 @@ function cpuFinishWord() {
   state.cpuHit = 1;
   state.shake = Math.max(state.shake, 0.65);
   burst(640, 236, lv);
+  state.cheers.push({
+    x: 690, y: 215,
+    text: choice(['よっ！', 'ぐぐ', 'ハッ！', 'ふん！', 'よし！']),
+    age: 0, maxAge: 720, color: '#9fd0ff',
+  });
   state.cpuWord = pickWord();
   state.cpuTyped = '';
   state.cpuProgress = 0;
@@ -630,6 +566,9 @@ function handleText(text) {
     finishWord();
   } else if (r === 'prefix') {
     state.typed = next;
+    state.miniHit = 0.4;
+    state.shake = Math.max(state.shake, 0.16);
+    miniBurst();
   } else {
     failInput();
     state.typed = '';
@@ -652,6 +591,41 @@ function burst(x, y, lv) {
   }
 }
 
+function miniBurst() {
+  const px = 210 + Math.max(-110, Math.min(110, -state.rope * 110));
+  for (let i = 0; i < 5; i++) {
+    state.sparks.push({
+      x: px + 55 + (Math.random() - 0.5) * 18,
+      y: 218 + (Math.random() - 0.5) * 16,
+      vx: (Math.random() - 0.5) * 130,
+      vy: -Math.random() * 95,
+      life: 230 + Math.random() * 100,
+      age: 0,
+      r: 2 + Math.random() * 2,
+      c: '#ffeb35',
+    });
+  }
+}
+
+function spawnGameOverConfetti() {
+  if (state.over === 'draw') return;
+  const isPlayerWin = state.over === 'win';
+  const xRange = isPlayerWin ? [60, 380] : [520, 850];
+  for (let i = 0; i < 80; i++) {
+    state.confetti.push({
+      x: xRange[0] + Math.random() * (xRange[1] - xRange[0]),
+      y: -20 - Math.random() * 50,
+      vx: (Math.random() - 0.5) * 70,
+      vy: 30 + Math.random() * 80,
+      rot: Math.random() * Math.PI * 2,
+      spin: (Math.random() - 0.5) * 7,
+      color: ['#ff1010','#ffde2e','#3d7cff','#fff','#ff8a8a','#ffeb35','#80c8ff'][Math.floor(Math.random() * 7)],
+      life: 4500, age: 0,
+      w: 5 + Math.random() * 8, h: 8 + Math.random() * 9,
+    });
+  }
+}
+
 function update() {
   const now = performance.now();
   const dt = Math.min(40, now - state.last);
@@ -665,28 +639,49 @@ function update() {
     const cpuChars = Math.min(cpuLen, Math.floor(state.cpuProgress * cpuLen));
     state.cpuTyped = state.cpuWord.r.slice(0, cpuChars);
     if (state.cpuProgress >= 1) cpuFinishWord();
-
     const force = (state.playerPeople - state.cpuPeople) * 0.000019;
     state.rope += force * dt;
     if (state.rope > 0.62 && Math.random() < 0.012) state.hit = Math.max(state.hit, .35);
     if (state.rope < -0.62 && Math.random() < 0.018) state.cpuHit = Math.max(state.cpuHit, .45);
-    if (state.rope >= 1) state.over = 'win';
-    if (state.rope <= -1) state.over = 'lose';
+    if (state.rope >= 1) { state.over = 'win'; state.overStart = now; }
+    if (state.rope <= -1) { state.over = 'lose'; state.overStart = now; }
     if (left <= 0 && !state.over) {
       if (Math.abs(state.rope) < 0.05) state.over = 'draw';
       else state.over = state.rope >= 0 ? 'win' : 'lose';
+      state.overStart = now;
+    }
+  } else {
+    const overElapsed = now - state.overStart;
+    if (!state.confettiSpawned && overElapsed > 100) {
+      spawnGameOverConfetti();
+      state.confettiSpawned = true;
     }
   }
   state.rope = Math.max(-1.08, Math.min(1.08, state.rope));
   state.hit = Math.max(0, state.hit - dt / 240);
   state.cpuHit = Math.max(0, state.cpuHit - dt / 260);
+  state.miniHit = Math.max(0, state.miniHit - dt / 200);
   state.shake = Math.max(0, state.shake - dt / 260);
+  state.errorFlash = Math.max(0, state.errorFlash - dt);
   state.sparks = state.sparks.filter(p => {
     p.age += dt;
     p.x += p.vx * dt / 1000;
     p.y += p.vy * dt / 1000;
     p.vy += 480 * dt / 1000;
     return p.age < p.life;
+  });
+  state.confetti = state.confetti.filter(c => {
+    c.age += dt;
+    c.x += c.vx * dt / 1000;
+    c.y += c.vy * dt / 1000;
+    c.vy += 130 * dt / 1000;
+    c.rot += c.spin * dt / 1000;
+    return c.age < c.life && c.y < H + 60;
+  });
+  state.cheers = state.cheers.filter(c => {
+    c.age += dt;
+    c.y -= dt * 0.04;
+    return c.age < c.maxAge;
   });
   draw(left);
   renderUI(left);
@@ -717,26 +712,31 @@ function curvePoints(p1, ctl, p2, steps) {
   return points;
 }
 
-function drawRopePath(points, width) {
+function drawRopePath(points, width, glowing) {
   if (points.length < 2) return;
   ctx.save();
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
-  // outline
+  if (glowing) {
+    ctx.strokeStyle = 'rgba(255,220,80,0.55)';
+    ctx.lineWidth = width + 18;
+    ctx.beginPath();
+    ctx.moveTo(points[0][0], points[0][1]);
+    for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1]);
+    ctx.stroke();
+  }
   ctx.strokeStyle = '#050505';
   ctx.lineWidth = width + 8;
   ctx.beginPath();
   ctx.moveTo(points[0][0], points[0][1]);
   for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1]);
   ctx.stroke();
-  // body
   ctx.strokeStyle = '#d8b97c';
   ctx.lineWidth = width;
   ctx.beginPath();
   ctx.moveTo(points[0][0], points[0][1]);
   for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1]);
   ctx.stroke();
-  // shadow band on lower side
   ctx.strokeStyle = 'rgba(90,60,20,0.45)';
   ctx.lineWidth = Math.max(2, width * 0.25);
   ctx.beginPath();
@@ -745,8 +745,7 @@ function drawRopePath(points, width) {
     let nx = 0, ny = 1;
     if (i < points.length - 1) {
       const np = points[i+1];
-      const dx = np[0] - p[0];
-      const dy = np[1] - p[1];
+      const dx = np[0] - p[0]; const dy = np[1] - p[1];
       const len = Math.hypot(dx, dy);
       if (len > 0.01) { nx = dy/len; ny = -dx/len; }
     }
@@ -756,24 +755,20 @@ function drawRopePath(points, width) {
     else ctx.lineTo(ox, oy);
   }
   ctx.stroke();
-  // braided chevrons
   ctx.strokeStyle = '#5a3c20';
   ctx.lineWidth = Math.max(2.2, width * 0.18);
   const spacing = 13;
   let acc = 0;
   for (let i = 0; i < points.length - 1; i++) {
-    const a = points[i];
-    const b = points[i + 1];
-    const dx = b[0] - a[0];
-    const dy = b[1] - a[1];
+    const a = points[i]; const b = points[i + 1];
+    const dx = b[0] - a[0]; const dy = b[1] - a[1];
     const len = Math.hypot(dx, dy);
     if (len < 0.01) continue;
     const ux = dx / len, uy = dy / len;
     const nx = -uy, ny = ux;
     let pos = spacing - (acc % spacing);
     while (pos < len) {
-      const cx = a[0] + ux * pos;
-      const cy = a[1] + uy * pos;
+      const cx = a[0] + ux * pos; const cy = a[1] + uy * pos;
       const half = width * 0.42;
       ctx.beginPath();
       ctx.moveTo(cx + nx * half - ux * 5, cy + ny * half - uy * 5);
@@ -784,7 +779,6 @@ function drawRopePath(points, width) {
     }
     acc += len;
   }
-  // highlight strip on upper side
   ctx.strokeStyle = 'rgba(255,245,210,0.55)';
   ctx.lineWidth = Math.max(2, width * 0.16);
   ctx.beginPath();
@@ -793,8 +787,7 @@ function drawRopePath(points, width) {
     let nx = 0, ny = -1;
     if (i < points.length - 1) {
       const np = points[i+1];
-      const dx = np[0] - p[0];
-      const dy = np[1] - p[1];
+      const dx = np[0] - p[0]; const dy = np[1] - p[1];
       const len = Math.hypot(dx, dy);
       if (len > 0.01) { nx = dy/len; ny = -dx/len; }
     }
@@ -807,14 +800,13 @@ function drawRopePath(points, width) {
   ctx.restore();
 }
 
-function drawBraidedRope(leftHand, rightHand, ropeState, tension, width) {
+function drawBraidedRope(leftHand, rightHand, ropeState, tension, width, extraSag, glowing) {
   const midX = (leftHand[0] + rightHand[0]) / 2;
   const midY = (leftHand[1] + rightHand[1]) / 2;
-  const sag = 14 - tension * 10;
+  const sag = 14 - tension * 10 + (extraSag || 0);
   const wave = Math.sin(performance.now() / 160) * (1 + (1 - tension) * 2);
   const controlY = midY + sag * 2 + wave;
   const points = curvePoints(leftHand, [midX, controlY], rightHand, 30);
-  // dangling tails
   const tailWave = Math.sin(performance.now() / 180) * 4;
   const leftTailPoints = curvePoints(
     leftHand,
@@ -828,10 +820,9 @@ function drawBraidedRope(leftHand, rightHand, ropeState, tension, width) {
     [rightHand[0] + 76, rightHand[1] + 102 - tailWave],
     15
   );
-  drawRopePath(leftTailPoints, width * 0.78);
-  drawRopePath(rightTailPoints, width * 0.78);
-  drawRopePath(points, width);
-  // central red marker (knot)
+  drawRopePath(leftTailPoints, width * 0.78, glowing);
+  drawRopePath(rightTailPoints, width * 0.78, glowing);
+  drawRopePath(points, width, glowing);
   const ropeRange = (rightHand[0] - leftHand[0]) * 0.42;
   const markerWorldX = (leftHand[0] + rightHand[0]) / 2 - ropeState * ropeRange;
   let bestT = 0.5, bestDist = Infinity;
@@ -852,7 +843,6 @@ function drawBraidedRope(leftHand, rightHand, ropeState, tension, width) {
   ctx.roundRect(mx - 14, my - width * 0.6, 28, width * 1.2, 6);
   ctx.fill();
   ctx.stroke();
-  // hanging ribbon
   ctx.fillStyle = '#e60012';
   ctx.strokeStyle = '#050505';
   ctx.lineWidth = 3;
@@ -867,14 +857,27 @@ function drawBraidedRope(leftHand, rightHand, ropeState, tension, width) {
   ctx.restore();
 }
 
-function drawPerson(x, y, scale, dir, effort, face) {
-  const lean = effort * 26 * dir;
-  const headX = x + lean * .35;
-  const headY = y - 122 * scale + effort * 6;
+function drawPerson(x, y, scale, dir, effort, face, fallAmount, jumpY, seed) {
+  fallAmount = fallAmount || 0;
+  jumpY = jumpY || 0;
+  seed = seed || 0;
+  const t = performance.now() / 1000;
+  const breathe = Math.sin(t * 2 + seed * 1.3) * 1.2;
+  const stepShift = Math.sin(t * 3.0 + seed * 2.1) * 0.7;
+  const ax = x + stepShift;
+  const ay = y + breathe + jumpY;
   ctx.save();
+  if (fallAmount > 0.01) {
+    const feetY = ay + 48 * scale;
+    ctx.translate(ax, feetY);
+    ctx.rotate(fallAmount * dir * Math.PI / 2 * 0.92);
+    ctx.translate(-ax, -feetY);
+  }
+  const lean = effort * 26 * dir;
+  const headX = ax + lean * .35;
+  const headY = ay - 122 * scale + effort * 6;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
-  // head outline
   ctx.fillStyle = '#fff';
   ctx.strokeStyle = '#050505';
   ctx.lineWidth = 9 * scale;
@@ -882,14 +885,14 @@ function drawPerson(x, y, scale, dir, effort, face) {
   ctx.arc(headX, headY, 40 * scale, 0, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
-  // eyes: black dots
+  // eyes
   ctx.fillStyle = '#050505';
-  const eyeOffsetY = -4 * scale;
+  const eyeY = headY - 4 * scale;
   ctx.beginPath();
-  ctx.arc(headX - 14 * scale, headY + eyeOffsetY, 5.5 * scale, 0, Math.PI * 2);
-  ctx.arc(headX + 14 * scale, headY + eyeOffsetY, 5.5 * scale, 0, Math.PI * 2);
+  ctx.arc(headX - 14 * scale, eyeY, 5.5 * scale, 0, Math.PI * 2);
+  ctx.arc(headX + 14 * scale, eyeY, 5.5 * scale, 0, Math.PI * 2);
   ctx.fill();
-  // eyebrows during effort
+  // eyebrows when effortful
   if (effort > 0.4) {
     ctx.strokeStyle = '#050505';
     ctx.lineWidth = 4 * scale;
@@ -900,17 +903,15 @@ function drawPerson(x, y, scale, dir, effort, face) {
     ctx.lineTo(headX + 7 * scale, headY - 11 * scale);
     ctx.stroke();
   }
-  // mouth: face state
+  // mouth
   ctx.strokeStyle = '#050505';
   ctx.lineWidth = 5 * scale;
   if (face === 'panic') {
-    // round panic mouth
     ctx.fillStyle = '#050505';
     ctx.beginPath();
     ctx.ellipse(headX, headY + 18 * scale, 7 * scale, 9 * scale, 0, 0, Math.PI * 2);
     ctx.fill();
   } else if (effort > 0.55) {
-    // gritted teeth zigzag
     ctx.beginPath();
     const baseY = headY + 18 * scale;
     ctx.moveTo(headX - 16 * scale, baseY);
@@ -921,26 +922,31 @@ function drawPerson(x, y, scale, dir, effort, face) {
     ctx.lineTo(headX + 17 * scale, baseY + 5 * scale);
     ctx.stroke();
   } else {
-    // determined mouth: short line
     ctx.beginPath();
     ctx.moveTo(headX - 11 * scale, headY + 20 * scale);
     ctx.lineTo(headX + 11 * scale, headY + 20 * scale);
     ctx.stroke();
   }
   // body
-  const neck = [x + lean * .15, y - 78 * scale];
-  const hip = [x - lean * .12, y - 18 * scale];
+  const neck = [ax + lean * .15, ay - 78 * scale];
+  const hip = [ax - lean * .12, ay - 18 * scale];
   ctx.strokeStyle = '#050505';
   strokeLine([neck, hip], 8 * scale);
-  // legs: braced stance for effort
-  const frontFoot = [x + 38 * dir, y + 48 * scale];
-  const backFoot = [x - 36 * dir, y + 48 * scale + (effort > 0.4 ? 4 : 0)];
+  const frontFoot = [ax + 38 * dir, ay + 48 * scale];
+  const backFoot = [ax - 36 * dir, ay + 48 * scale + (effort > 0.4 ? 4 : 0)];
   strokeLine([hip, frontFoot], 8 * scale);
   strokeLine([hip, backFoot], 8 * scale);
-  // arms reaching forward to rope
-  const hand = [x + 56 * dir, y - 68 * scale + effort * 8];
+  // arms reach toward rope
+  const armReachY = ay - 68 * scale + effort * 8;
+  // game-over wave: arms up for winner
+  let hand;
+  if (jumpY < -2) {
+    hand = [ax + 30 * dir, ay - 130 * scale];
+  } else {
+    hand = [ax + 56 * dir, armReachY];
+  }
   strokeLine([neck, hand], 8 * scale);
-  strokeLine([[x - 2 * dir, y - 62 * scale], [hand[0] - 8 * dir, hand[1] + 16 * scale]], 8 * scale);
+  strokeLine([[ax - 2 * dir, ay - 62 * scale], [hand[0] - 8 * dir, hand[1] + 16 * scale]], 8 * scale);
   ctx.restore();
   return hand;
 }
@@ -954,40 +960,54 @@ function draw(left) {
   // sky
   ctx.fillStyle = '#7d5e68';
   ctx.fillRect(0, 0, W, H);
-  // ambient clouds
+  // drifting clouds
+  const t = performance.now() / 1000;
+  const cloudX1 = 580 + Math.sin(t * 0.3) * 38;
+  const cloudY1 = 95 + Math.cos(t * 0.22) * 6;
   ctx.fillStyle = 'rgba(76, 55, 65, .38)';
   ctx.beginPath();
-  ctx.ellipse(580, 95, 210, 62, -0.26, 0, Math.PI * 2);
+  ctx.ellipse(cloudX1, cloudY1, 210, 62, -0.26, 0, Math.PI * 2);
   ctx.fill();
+  const cloudX2 = 185 + Math.sin(t * 0.25 + 1.5) * 28;
+  const cloudY2 = 182 + Math.cos(t * 0.19) * 5;
   ctx.fillStyle = 'rgba(170, 132, 110, .32)';
   ctx.beginPath();
-  ctx.ellipse(185, 182, 300, 82, 0.2, 0, Math.PI * 2);
+  ctx.ellipse(cloudX2, cloudY2, 300, 82, 0.2, 0, Math.PI * 2);
   ctx.fill();
-  // wood floor base
+  const cloudX3 = 760 + Math.sin(t * 0.18 + 3.0) * 22;
+  const cloudY3 = 200 + Math.cos(t * 0.21) * 5;
+  ctx.fillStyle = 'rgba(115, 90, 88, .28)';
+  ctx.beginPath();
+  ctx.ellipse(cloudX3, cloudY3, 180, 50, -0.18, 0, Math.PI * 2);
+  ctx.fill();
+  // rush flash
+  const rushActive = performance.now() < state.rushUntil && !state.over;
+  if (rushActive) {
+    const pulse = 0.10 + Math.sin(performance.now() / 110) * 0.05;
+    ctx.fillStyle = 'rgba(255,200,40,' + pulse + ')';
+    ctx.fillRect(0, 0, W, H);
+  }
+  // wood floor
   ctx.fillStyle = '#8a6a4c';
   ctx.fillRect(0, 350, W, 110);
-  // horizontal grain
   ctx.strokeStyle = 'rgba(82,55,30,0.55)';
   ctx.lineWidth = 1.2;
   for (let y = 358; y < H; y += 11) {
     ctx.beginPath();
-    for (let x = 0; x <= W; x += 18) {
-      const variance = Math.sin(x * 0.028 + y * 0.13) * 1.6 + Math.sin(x * 0.011 - y * 0.07) * 0.8;
-      if (x === 0) ctx.moveTo(x, y + variance);
-      else ctx.lineTo(x, y + variance);
+    for (let xx = 0; xx <= W; xx += 18) {
+      const variance = Math.sin(xx * 0.028 + y * 0.13) * 1.6 + Math.sin(xx * 0.011 - y * 0.07) * 0.8;
+      if (xx === 0) ctx.moveTo(xx, y + variance);
+      else ctx.lineTo(xx, y + variance);
     }
     ctx.stroke();
   }
-  // plank seams
   ctx.strokeStyle = '#3d2a1a';
   ctx.lineWidth = 2.5;
-  for (let x = 120; x < W; x += 180) {
+  for (let xx = 120; xx < W; xx += 180) {
     ctx.beginPath();
-    ctx.moveTo(x, 350);
-    ctx.lineTo(x, H);
+    ctx.moveTo(xx, 350); ctx.lineTo(xx, H);
     ctx.stroke();
   }
-  // knots
   ctx.fillStyle = '#5a3c1f';
   ctx.strokeStyle = '#2a1812';
   ctx.lineWidth = 1.5;
@@ -998,14 +1018,13 @@ function draw(left) {
     ctx.fill();
     ctx.stroke();
   }
-  // ground top edge
   ctx.strokeStyle = '#2a1812';
   ctx.lineWidth = 4;
   ctx.beginPath();
   ctx.moveTo(0, 350); ctx.lineTo(W, 350);
   ctx.stroke();
 
-  // positions (clamp ropeShift so teams stay on canvas)
+  // positions
   const ropeShift = Math.max(-110, Math.min(110, -state.rope * 110));
   const playerBase = 210 + ropeShift;
   const cpuBase = 690 + ropeShift;
@@ -1013,17 +1032,42 @@ function draw(left) {
   const cpuDisplay = Math.min(6, state.cpuPeople);
   const playerExtra = Math.max(0, state.playerPeople - playerDisplay);
   const cpuExtra = Math.max(0, state.cpuPeople - cpuDisplay);
-  const pEffort = .15 + state.hit * .85;
+  const pEffort = .15 + state.hit * .85 + state.miniHit * 0.3;
   const cEffort = .2 + state.cpuHit * .65;
+
+  // game over animation
+  const overElapsed = state.over ? performance.now() - state.overStart : 0;
+  const isPlayerWin = state.over === 'win';
+  const isPlayerLose = state.over === 'lose';
+  const playerFall = isPlayerLose ? Math.min(1, overElapsed / 700) : 0;
+  const cpuFall = isPlayerWin ? Math.min(1, overElapsed / 700) : 0;
+  const playerJump = isPlayerWin && overElapsed > 200 ? -Math.abs(Math.sin(overElapsed / 280)) * 22 : 0;
+  const cpuJump = isPlayerLose && overElapsed > 200 ? -Math.abs(Math.sin(overElapsed / 280)) * 18 : 0;
+
   const pHands = [];
   const cHands = [];
   for (let i = playerDisplay - 1; i >= 0; i--) {
-    pHands.push(drawPerson(playerBase - i * 30, 316, .82, 1, i ? .15 : pEffort, state.over === 'lose' ? 'panic' : 'normal'));
+    const fall = Math.max(0, playerFall * (1 - i * 0.12));
+    const jump = playerJump * (1 - i * 0.08);
+    const seed = i * 1.7;
+    pHands.push(drawPerson(
+      playerBase - i * 30, 316, .82, 1,
+      i ? .15 + state.miniHit * 0.15 : pEffort,
+      isPlayerLose ? 'panic' : 'normal',
+      fall, jump, seed
+    ));
   }
   for (let i = cpuDisplay - 1; i >= 0; i--) {
-    cHands.push(drawPerson(cpuBase + i * 28, 316, .76, -1, i ? .15 : cEffort, state.over === 'win' ? 'panic' : 'normal'));
+    const fall = Math.max(0, cpuFall * (1 - i * 0.12));
+    const jump = cpuJump * (1 - i * 0.08);
+    const seed = 5 + i * 1.7;
+    cHands.push(drawPerson(
+      cpuBase + i * 28, 316, .76, -1,
+      i ? .15 : cEffort,
+      isPlayerWin ? 'panic' : 'normal',
+      fall, jump, seed
+    ));
   }
-  // extras badge
   if (playerExtra > 0) {
     ctx.fillStyle = '#ffeb35';
     ctx.strokeStyle = '#050505';
@@ -1042,13 +1086,13 @@ function draw(left) {
     ctx.strokeText('+' + cpuExtra, cpuBase + (cpuDisplay - 1) * 28 + 26, 296);
     ctx.fillText('+' + cpuExtra, cpuBase + (cpuDisplay - 1) * 28 + 26, 296);
   }
-  // rope
-  const tension = Math.max(pEffort, cEffort);
+  // rope (with golden glow during rush)
   if (pHands[0] && cHands[0]) {
-    drawBraidedRope(pHands[0], cHands[0], state.rope, tension, 20);
+    const extraSag = state.over ? Math.min(60, overElapsed / 16) : 0;
+    drawBraidedRope(pHands[0], cHands[0], state.rope, Math.max(pEffort, cEffort), 20, extraSag, rushActive);
   }
 
-  // people count labels
+  // labels
   ctx.font = '900 28px sans-serif';
   ctx.lineWidth = 7;
   ctx.strokeStyle = '#050505';
@@ -1060,37 +1104,44 @@ function draw(left) {
   ctx.strokeText('CPU ' + state.cpuPeople + '人', W - 24, 42);
   ctx.fillText('CPU ' + state.cpuPeople + '人', W - 24, 42);
 
-  // DANGER (player losing)
-  if (state.rope < -0.62) {
-    ctx.font = '1000 42px sans-serif';
+  // DANGER blink
+  if (state.rope < -0.62 && !state.over) {
+    const blink = Math.floor(performance.now() / 180) % 2 === 0;
+    if (blink) {
+      ctx.fillStyle = 'rgba(255,16,16,0.10)';
+      ctx.fillRect(0, 0, W, H);
+    }
+    ctx.font = '1000 52px sans-serif';
     ctx.textAlign = 'center';
-    ctx.lineWidth = 8;
+    ctx.lineWidth = 9;
     ctx.strokeStyle = '#fff';
-    ctx.fillStyle = '#ff1010';
+    ctx.fillStyle = blink ? '#ff1010' : '#ff8a8a';
     ctx.strokeText('DANGER!', W / 2, 96);
     ctx.fillText('DANGER!', W / 2, 96);
   }
-  // CHANCE (player winning)
-  if (state.rope > 0.62) {
-    ctx.font = '1000 42px sans-serif';
+  // CHANCE blink
+  if (state.rope > 0.62 && !state.over) {
+    const blink = Math.floor(performance.now() / 180) % 2 === 0;
+    ctx.font = '1000 48px sans-serif';
     ctx.textAlign = 'center';
-    ctx.lineWidth = 8;
+    ctx.lineWidth = 9;
     ctx.strokeStyle = '#fff';
-    ctx.fillStyle = '#3d7cff';
+    ctx.fillStyle = blink ? '#3d7cff' : '#7faaff';
     ctx.strokeText('CHANCE!', W / 2, 96);
     ctx.fillText('CHANCE!', W / 2, 96);
   }
-  // 応援ラッシュ
-  if (performance.now() < state.rushUntil) {
-    ctx.font = '1000 38px sans-serif';
+  // rush text
+  if (rushActive) {
+    const wobble = Math.sin(performance.now() / 120) * 4;
+    ctx.font = '1000 44px sans-serif';
     ctx.textAlign = 'center';
-    ctx.lineWidth = 7;
+    ctx.lineWidth = 8;
     ctx.strokeStyle = '#050505';
     ctx.fillStyle = '#ffeb35';
-    ctx.strokeText('応援ラッシュ', W / 2, 132);
-    ctx.fillText('応援ラッシュ', W / 2, 132);
+    ctx.strokeText('応援ラッシュ', W / 2, 138 + wobble);
+    ctx.fillText('応援ラッシュ', W / 2, 138 + wobble);
   }
-  // pull-success burst text
+  // burst text
   if (state.hit > .25) {
     ctx.font = '1000 48px sans-serif';
     ctx.textAlign = 'center';
@@ -1109,7 +1160,34 @@ function draw(left) {
     ctx.strokeText('ぐぬぬ！', 580, 112);
     ctx.fillText('ぐぬぬ！', 580, 112);
   }
-  // particles
+  // CPU 残り 警告
+  if (state.cpuProgress > 0.7 && !state.over) {
+    const remaining = state.cpuWord.r.length - state.cpuTyped.length;
+    const urgent = state.cpuProgress > 0.85;
+    const blink = urgent ? (Math.floor(performance.now() / 150) % 2 === 0) : true;
+    ctx.font = '900 ' + (urgent ? 28 : 22) + 'px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.lineWidth = 6;
+    ctx.strokeStyle = '#fff';
+    ctx.fillStyle = blink ? '#ff1010' : '#ff8a8a';
+    const txt = 'CPU残り' + remaining + '!';
+    ctx.strokeText(txt, cpuBase, 162);
+    ctx.fillText(txt, cpuBase, 162);
+  }
+  // cheers
+  for (const c of state.cheers) {
+    const a = Math.max(0, 1 - c.age / c.maxAge);
+    ctx.globalAlpha = a;
+    ctx.font = '900 26px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.lineWidth = 7;
+    ctx.strokeStyle = '#050505';
+    ctx.fillStyle = c.color || '#ffeb35';
+    ctx.strokeText(c.text, c.x, c.y);
+    ctx.fillText(c.text, c.x, c.y);
+  }
+  ctx.globalAlpha = 1;
+  // sparks
   for (const p of state.sparks) {
     const a = 1 - p.age / p.life;
     ctx.globalAlpha = a;
@@ -1119,6 +1197,49 @@ function draw(left) {
     ctx.fill();
   }
   ctx.globalAlpha = 1;
+  // confetti
+  for (const c of state.confetti) {
+    const a = Math.max(0, 1 - c.age / c.life);
+    ctx.globalAlpha = a;
+    ctx.save();
+    ctx.translate(c.x, c.y);
+    ctx.rotate(c.rot);
+    ctx.fillStyle = c.color;
+    ctx.strokeStyle = '#050505';
+    ctx.lineWidth = 1.2;
+    ctx.fillRect(-c.w / 2, -c.h / 2, c.w, c.h);
+    ctx.strokeRect(-c.w / 2, -c.h / 2, c.w, c.h);
+    ctx.restore();
+  }
+  ctx.globalAlpha = 1;
+  // error flash
+  if (state.errorFlash > 0) {
+    const a = (state.errorFlash / 400) * 0.32;
+    ctx.fillStyle = 'rgba(255,30,30,' + a + ')';
+    ctx.fillRect(0, 0, W, H);
+  }
+  // countdown last 5s
+  if (left < 5000 && left > 0 && !state.over) {
+    const sec = Math.ceil(left / 1000);
+    const subSec = (left % 1000) / 1000;
+    const scl = 1.15 + (1 - subSec) * 0.35;
+    const alpha = 0.65 + subSec * 0.35;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(W / 2, H / 2);
+    ctx.scale(scl, scl);
+    ctx.font = '1000 180px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.lineWidth = 18;
+    ctx.strokeStyle = '#fff';
+    ctx.fillStyle = '#ff1010';
+    ctx.strokeText(String(sec), 0, 0);
+    ctx.fillText(String(sec), 0, 0);
+    ctx.restore();
+    ctx.globalAlpha = 1;
+  }
+  // game over rope drop hint: no extra rendering needed (rope sags via extraSag)
   ctx.restore();
 }
 
@@ -1141,6 +1262,11 @@ function renderUI(left) {
   ui.cpuKana.textContent = state.cpuWord.k;
   ui.cpuRoma.innerHTML = '<span class="typed">' + state.cpuTyped + '</span>' + state.cpuWord.r.slice(state.cpuTyped.length);
   ui.cpuProgress.style.width = Math.min(100, state.cpuProgress * 100) + '%';
+
+  ui.playerCard.className = 'word-card player-card lv' + state.word.lv;
+  const cpuAlmost = state.cpuProgress > 0.75 && !state.over;
+  ui.cpuCard.className = 'word-card cpu-card lv' + state.cpuWord.lv + (cpuAlmost ? ' almost' : '');
+
   if (state.over) {
     ui.overlay.style.display = 'flex';
     if (state.over === 'win') {
