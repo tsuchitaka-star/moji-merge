@@ -27,13 +27,14 @@
 
 実装時の優先参照順は以下です。
 
-1. 実装仕様書 / Source of Truth: [`docs/codex-implementation-spec.md`](docs/codex-implementation-spec.md)
-2. 実装可能性レビュー: [`docs/implementation-feasibility-review.md`](docs/implementation-feasibility-review.md)
-3. 現在仕様メモ: [`docs/current-gameplay-spec.md`](docs/current-gameplay-spec.md)
-4. グラフィック制作仕様: [`docs/graphic-spec-for-claude.md`](docs/graphic-spec-for-claude.md)
-5. オンライン環境仕様: [`docs/online-environment.md`](docs/online-environment.md)
+1. 最新の上書き補遺: [`docs/source-of-truth-amendment-2026-06-27.md`](docs/source-of-truth-amendment-2026-06-27.md)
+2. 実装仕様書 / 詳細バックログ: [`docs/codex-implementation-spec.md`](docs/codex-implementation-spec.md)
+3. 実装可能性レビュー: [`docs/implementation-feasibility-review.md`](docs/implementation-feasibility-review.md)
+4. 現在仕様メモ: [`docs/current-gameplay-spec.md`](docs/current-gameplay-spec.md)
+5. グラフィック制作仕様: [`docs/graphic-spec-for-claude.md`](docs/graphic-spec-for-claude.md)
+6. オンライン環境仕様: [`docs/online-environment.md`](docs/online-environment.md)
 
-`docs/codex-implementation-spec.md` は、単一HTMLプロトタイプを公開可能なWeb/PWAゲームへ移行するための本実装仕様です。`current-gameplay-spec.md` と差分が出た場合は、`codex-implementation-spec.md` を優先します。ただし、プレイ画面のデザイン・挙動はClaude作成版を勝手に変更しません。
+`docs/codex-implementation-spec.md` は、単一HTMLプロトタイプを公開可能なWeb/PWAゲームへ広げるための詳細バックログです。ただし、プレイ画面の保護方針と矛盾する箇所は `docs/source-of-truth-amendment-2026-06-27.md` を優先します。特に、Claude作成のプレイ画面をCodexが勝手に置換・再実装することは禁止です。
 
 ## Notion
 
@@ -54,11 +55,12 @@ src/          本実装
 
 ## Claudeに参照してほしいもの
 
-1. `prototype/moji-merge-tsunahiki-bold-concept.html`
-2. `prototype/moji-merge-app.html`
-3. `docs/codex-implementation-spec.md`
-4. `docs/implementation-feasibility-review.md`
-5. `docs/current-gameplay-spec.md`
-6. `docs/graphic-spec-for-claude.md`
+1. `docs/source-of-truth-amendment-2026-06-27.md`
+2. `prototype/moji-merge-tsunahiki-bold-concept.html`
+3. `prototype/moji-merge-app.html`
+4. `docs/codex-implementation-spec.md`
+5. `docs/implementation-feasibility-review.md`
+6. `docs/current-gameplay-spec.md`
+7. `docs/graphic-spec-for-claude.md`
 
 まずはClaude版プレイ画面の魅力を保ちながら、ホーム・設定・保存・統計などの外側を整えます。
