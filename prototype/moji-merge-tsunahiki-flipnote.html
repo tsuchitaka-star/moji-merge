@@ -454,6 +454,8 @@ function reset() {
     fallY: 0,
     fallRot: 0,
     charCombo: 0,
+    preGame: true,
+    preGameStart: performance.now(),
   };
   state.word = pickWord();
   state.cpuWord = pickWord();
@@ -486,7 +488,7 @@ function finishWord() {
 function onCharCorrect() {
   state.charCombo++;
   // 純粋: 1文字入力 = 固定量引く
-  state.rope += 0.026;
+  state.rope += 0.020;
   state.hit = Math.max(state.hit, 0.45);
 }
 
@@ -514,6 +516,7 @@ function cpuFinishWord() {
 
 function handleText(text) {
   if (state.over) return;
+  if (state.preGame) return;
   const ch = text.slice(-1).toLowerCase();
   if (!/^[a-z]$/.test(ch)) return;
   const next = state.typed + ch;
@@ -807,6 +810,18 @@ function drawRopeAndMarker(p1, p2, ropeState, tension) {
 function update() {
   const now = performance.now();
   maybeUpdateJitter(now);
+  if (state.preGame) {
+    const preElapsed = now - state.preGameStart;
+    if (preElapsed >= 3500) {
+      state.preGame = false;
+      state.start = now;
+      state.last = now;
+    }
+    draw(TIME_LIMIT);
+    renderUI(TIME_LIMIT);
+    requestAnimationFrame(update);
+    return;
+  }
   const dt = Math.min(40, now - state.last);
   state.last = now;
   const elapsed = now - state.start;
@@ -820,7 +835,7 @@ function update() {
     state.cpuTyped = state.cpuWord.r.slice(0, cpuChars);
     const newCpuChars = state.cpuTyped.length - prevCpuTyped.length;
     if (newCpuChars > 0) {
-      state.rope -= 0.022 * newCpuChars;
+      state.rope -= 0.020 * newCpuChars;
       state.cpuHit = Math.max(state.cpuHit, 0.35);
     }
     if (state.cpuProgress >= 1) cpuFinishWord();
@@ -978,6 +993,42 @@ function draw(left) {
     const a = (state.errorFlash / 400) * 0.22;
     ctx.fillStyle = 'rgba(212, 51, 44, ' + a + ')';
     ctx.fillRect(0, 0, W, H);
+  }
+  // pre-game countdown
+  if (state.preGame) {
+    const elapsed = performance.now() - state.preGameStart;
+    let label = '';
+    if (elapsed < 1000) label = '3';
+    else if (elapsed < 2000) label = '2';
+    else if (elapsed < 3000) label = '1';
+    else label = 'GO!';
+    // dim overlay
+    ctx.fillStyle = 'rgba(247, 243, 232, 0.65)';
+    ctx.fillRect(0, 0, W, H);
+    // big number
+    const subSec = (elapsed % 1000) / 1000;
+    const scl = 1.4 + (1 - subSec) * 0.6;
+    const alpha = 0.55 + subSec * 0.45;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(W/2, H/2);
+    ctx.scale(scl, scl);
+    ctx.font = '1000 180px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.lineWidth = 14;
+    ctx.strokeStyle = '#1a1612';
+    ctx.fillStyle = label === 'GO!' ? '#1a1612' : '#d4332c';
+    ctx.strokeText(label, 0, 0);
+    ctx.fillText(label, 0, 0);
+    ctx.restore();
+    ctx.textBaseline = 'alphabetic';
+    ctx.globalAlpha = 1;
+    // hint
+    ctx.font = '900 18px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#1a1612';
+    ctx.fillText('ローマ字で入力 → 引っ張る', W/2, H - 28);
   }
   ctx.restore();
 }
