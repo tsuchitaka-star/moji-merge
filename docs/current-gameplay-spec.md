@@ -1,14 +1,18 @@
 # モジマージ 現在仕様 - 綱引き対戦プロトタイプ
 
-更新日: 2026-06-26
+更新日: 2026-06-27
 
 ## 重要: 参照優先度
 
-実装時は [`docs/codex-implementation-spec.md`](codex-implementation-spec.md) を Source of Truth とする。
+実装時の優先参照順は以下とする。
 
-この `current-gameplay-spec.md` は、現在のプロトタイプのルール・見た目・Claude向け共有メモをまとめた補助資料です。画面構成、リリース優先度、データモデル、PWA、オンライン対戦、テスト方針などの本実装判断は `codex-implementation-spec.md` を優先します。
+1. ユーザーの最新指示
+2. [`docs/source-of-truth-amendment-2026-06-27.md`](source-of-truth-amendment-2026-06-27.md)
+3. この `current-gameplay-spec.md` のプレイ画面保護方針
+4. [`docs/codex-implementation-spec.md`](codex-implementation-spec.md) の非プレイ画面・バックエンド・保存・PWA・オンライン・テストに関する詳細
+5. [`docs/implementation-feasibility-review.md`](implementation-feasibility-review.md)
 
-実装可能性の整理は [`docs/implementation-feasibility-review.md`](implementation-feasibility-review.md) を参照してください。
+`docs/codex-implementation-spec.md` は詳細バックログとして有効。ただし、プレイ画面の保護方針と矛盾する箇所は `docs/source-of-truth-amendment-2026-06-27.md` を優先する。
 
 ## 重要: プレイ画面の保護方針
 
@@ -16,6 +20,7 @@
 - Codexは、ユーザーの明示許可なくプレイ画面の見た目・ゲーム仕様・描画・ルールを変更しない。
 - Home、難易度選択、Settings、Help、Stats、Achievementsなどの非プレイ画面は `prototype/moji-merge-app.html` で作成・更新できる。
 - バックエンド、保存、ランキング、オンライン同期、API、テストはCodexの担当範囲とする。
+- Vite / TypeScript移行は将来候補であり、現時点ではClaude版プレイ画面の置換・再実装には使わない。
 
 ## 現在の方向性
 
@@ -82,10 +87,11 @@
 
 ## Claudeに依頼したいこと
 
-1. まず `prototype/moji-merge-tsunahiki-bold-concept.html` を確認する。
-2. 必要に応じて `prototype/moji-merge-app.html` で外側画面との接続方針を確認する。
-3. `docs/codex-implementation-spec.md` と `docs/implementation-feasibility-review.md` で実装順とリスクを確認する。
-4. プレイ画面の世界観を壊さずに魅力を上げる。
-5. ロープ、キャラクター、UIカード、エフェクトをよりゲームらしく磨く。
-6. 「CPUもタイピングしている」「負けそう」「応援ラッシュ中」が一目で分かる演出を強める。
-7. スマホとPCの両方で破綻しないレイアウトにする。
+1. まず `docs/source-of-truth-amendment-2026-06-27.md` を確認する。
+2. 次に `prototype/moji-merge-tsunahiki-bold-concept.html` を確認する。
+3. 必要に応じて `prototype/moji-merge-app.html` で外側画面との接続方針を確認する。
+4. `docs/codex-implementation-spec.md` と `docs/implementation-feasibility-review.md` で実装順とリスクを確認する。
+5. プレイ画面の世界観を壊さずに魅力を上げる。
+6. ロープ、キャラクター、UIカード、エフェクトをよりゲームらしく磨く。
+7. 「CPUもタイピングしている」「負けそう」「応援ラッシュ中」が一目で分かる演出を強める。
+8. スマホとPCの両方で破綻しないレイアウトにする。
