@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <title>モジマージ 綱引き — うごメモ版</title>
 <style>
 * { box-sizing: border-box; }
@@ -152,9 +152,27 @@ button {
 }
 button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #1a1612; }
 @media (max-width: 600px) {
-  body { padding: 8px; }
-  .hud { grid-template-columns: 1fr; }
-  .battle-words { grid-template-columns: 1fr; }
+  body { padding: 6px; }
+  .title { margin: 2px 0 8px; }
+  .title h1 { font-size: 28px; }
+  .subtitle { font-size: 11px; margin-top: 4px; padding: 3px 10px; }
+  .hud { gap: 4px; margin-bottom: 6px; }
+  .pill { padding: 5px 4px; font-size: 11px; box-shadow: 2px 2px 0 #1a1612; }
+  .pill b { font-size: 14px; }
+  canvas { aspect-ratio: 4 / 3; border-width: 3px; box-shadow: 4px 4px 0 #1a1612; }
+  .battle-words { grid-template-columns: 1fr; gap: 8px; margin-top: 10px; }
+  .word-card { margin-top: 0; padding: 8px 8px 10px; box-shadow: 3px 3px 0 #1a1612; }
+  .kana { font-size: 38px; margin-top: 4px; }
+  .roma { font-size: 16px; margin-top: 6px; letter-spacing: 1px; }
+  .badge { font-size: 11px; padding: 1px 7px; }
+  .side-label { font-size: 12px; padding: 1px 6px; -webkit-text-stroke-width: 3px; }
+  .cpu-progress { height: 8px; max-width: 100%; margin: 8px 0 0; }
+  .rush { font-size: 11px; min-height: 16px; margin-top: 6px; -webkit-text-stroke-width: 2px; }
+  .foot { flex-direction: column; gap: 4px; margin-top: 8px; font-size: 11px; }
+  .overlay { gap: 8px; padding: 12px; }
+  .overlay h2 { font-size: 40px; }
+  .overlay p { font-size: 13px; }
+  button { padding: 7px 14px; font-size: 13px; }
 }
 </style>
 </head>
