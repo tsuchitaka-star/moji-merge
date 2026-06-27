@@ -454,7 +454,6 @@ function reset() {
     fallY: 0,
     fallRot: 0,
     charCombo: 0,
-    wordPlayerPush: 0,
   };
   state.word = pickWord();
   state.cpuWord = pickWord();
@@ -479,7 +478,6 @@ function finishWord() {
   state.playerPeople = Math.min(40, state.playerPeople + 1);
   state.hit = 1;
   state.shake = 0.6;
-  state.wordPlayerPush = 0;
   state.word = pickWord();
   state.typed = '';
   ui.input.value = '';
@@ -487,26 +485,21 @@ function finishWord() {
 
 function onCharCorrect() {
   state.charCombo++;
-  const rushMul = (performance.now() < state.rushUntil) ? 1.6 : 1;
-  const basePush = 0.0055 + Math.min(state.charCombo, 30) * 0.00035;
-  const push = basePush * rushMul;
-  state.rope += push;
-  state.wordPlayerPush += push;
+  // 純粋: 1文字入力 = 固定量引く
+  state.rope += 0.026;
   state.hit = Math.max(state.hit, 0.45);
 }
 
 function failInput() {
   state.combo = 0;
   state.charCombo = 0;
-  state.rope -= state.wordPlayerPush;
-  state.wordPlayerPush = 0;
-  state.cpuHit = 0.5;
-  state.shake = 0.7;
-  state.errorFlash = 500;
+  state.cpuHit = 0.4;
+  state.shake = 0.5;
+  state.errorFlash = 350;
   state.metrics.errorCount++;
   state.metrics.totalKeys++;
-  state.message = 'ミス！この単語の押しが戻る';
-  state.messageUntil = performance.now() + 1100;
+  state.message = 'ミス';
+  state.messageUntil = performance.now() + 800;
 }
 
 function cpuFinishWord() {
@@ -827,7 +820,7 @@ function update() {
     state.cpuTyped = state.cpuWord.r.slice(0, cpuChars);
     const newCpuChars = state.cpuTyped.length - prevCpuTyped.length;
     if (newCpuChars > 0) {
-      state.rope -= 0.0055 * newCpuChars;
+      state.rope -= 0.022 * newCpuChars;
       state.cpuHit = Math.max(state.cpuHit, 0.35);
     }
     if (state.cpuProgress >= 1) cpuFinishWord();
