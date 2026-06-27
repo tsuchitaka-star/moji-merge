@@ -166,7 +166,7 @@ button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #1a1612; }
   </div>
   <div class="hud">
     <div class="pill">COMBO <b id="combo">0</b></div>
-    <div class="pill">YOU <b id="power">1人</b></div>
+    <div class="pill">勢い <b id="power">0</b></div>
     <div class="pill">TIME <b id="time">45.0</b></div>
   </div>
   <div class="stage-wrap">
@@ -453,6 +453,8 @@ function reset() {
     saved: false,
     fallY: 0,
     fallRot: 0,
+    charCombo: 0,
+    wordPlayerPush: 0,
   };
   state.word = pickWord();
   state.cpuWord = pickWord();
@@ -463,8 +465,6 @@ function reset() {
 
 function finishWord() {
   const lv = state.word.lv;
-  const rushActive = performance.now() < state.rushUntil;
-  const addedPeople = lv * (rushActive ? 2 : 1);
   state.combo++;
   if (state.combo > state.metrics.maxCombo) state.metrics.maxCombo = state.combo;
   state.metrics.wordHits[lv] = (state.metrics.wordHits[lv] || 0) + 1;
@@ -473,35 +473,46 @@ function finishWord() {
     state.message = '応援ラッシュ！';
     state.messageUntil = performance.now() + 1600;
   } else {
-    state.message = '+' + addedPeople + '人';
-    state.messageUntil = performance.now() + 900;
+    state.message = '完了！';
+    state.messageUntil = performance.now() + 700;
   }
-  state.playerPeople = Math.min(40, state.playerPeople + addedPeople);
-  state.rope += 0.045 * addedPeople;
+  state.playerPeople = Math.min(40, state.playerPeople + 1);
   state.hit = 1;
-  state.shake = 1;
+  state.shake = 0.6;
+  state.wordPlayerPush = 0;
   state.word = pickWord();
   state.typed = '';
   ui.input.value = '';
 }
 
+function onCharCorrect() {
+  state.charCombo++;
+  const rushMul = (performance.now() < state.rushUntil) ? 1.6 : 1;
+  const basePush = 0.0055 + Math.min(state.charCombo, 30) * 0.00035;
+  const push = basePush * rushMul;
+  state.rope += push;
+  state.wordPlayerPush += push;
+  state.hit = Math.max(state.hit, 0.45);
+}
+
 function failInput() {
   state.combo = 0;
+  state.charCombo = 0;
+  state.rope -= state.wordPlayerPush;
+  state.wordPlayerPush = 0;
   state.cpuHit = 0.5;
-  state.shake = 0.55;
-  state.errorFlash = 400;
+  state.shake = 0.7;
+  state.errorFlash = 500;
   state.metrics.errorCount++;
   state.metrics.totalKeys++;
-  state.message = 'ミス';
-  state.messageUntil = performance.now() + 1000;
+  state.message = 'ミス！この単語の押しが戻る';
+  state.messageUntil = performance.now() + 1100;
 }
 
 function cpuFinishWord() {
   const lv = state.cpuWord.lv;
-  state.cpuPeople = Math.min(40, state.cpuPeople + lv);
-  state.rope -= 0.045 * lv;
-  state.cpuHit = 1;
-  state.shake = Math.max(state.shake, 0.65);
+  state.cpuPeople = Math.min(40, state.cpuPeople + 1);
+  state.cpuHit = 0.8;
   state.cpuWord = pickWord();
   state.cpuTyped = '';
   state.cpuProgress = 0;
@@ -515,9 +526,12 @@ function handleText(text) {
   const next = state.typed + ch;
   const r = checkInput(next, state.word.tokens);
   if (r === 'complete') {
-    state.typed = next; state.metrics.totalKeys++; state.metrics.correctKeys++; finishWord();
+    state.typed = next; state.metrics.totalKeys++; state.metrics.correctKeys++;
+    onCharCorrect();
+    finishWord();
   } else if (r === 'prefix') {
     state.typed = next; state.metrics.totalKeys++; state.metrics.correctKeys++;
+    onCharCorrect();
     state.miniHit = 0.4; state.shake = Math.max(state.shake, 0.16);
   } else {
     failInput(); state.typed = ''; ui.input.value = '';
@@ -795,27 +809,6 @@ function drawRopeAndMarker(p1, p2, ropeState, tension) {
     ctx.lineTo(px - nx*half, py - ny*half);
     ctx.stroke();
   }
-  // marker (stable, score-driven)
-  const stableMidX = (PLAYER_BASE_X + 50 + CPU_BASE_X - 50) / 2;
-  const stableRange = (CPU_BASE_X - 50 - PLAYER_BASE_X - 50) * 0.40;
-  const markerX = stableMidX - ropeState * stableRange;
-  const stableSag = sag * (1 - ropeState * ropeState);
-  const markerY = (p1[1] + p2[1]) / 2 + stableSag;
-  // draw marker with red accent
-  ctx.fillStyle = '#d4332c';
-  ctx.strokeStyle = '#1a1612';
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.arc(markerX, markerY, 11, 0, Math.PI*2);
-  ctx.fill();
-  ctx.stroke();
-  // X cross on marker
-  ctx.strokeStyle = '#1a1612';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(markerX - 5, markerY - 5); ctx.lineTo(markerX + 5, markerY + 5);
-  ctx.moveTo(markerX - 5, markerY + 5); ctx.lineTo(markerX + 5, markerY - 5);
-  ctx.stroke();
 }
 
 function update() {
@@ -826,15 +819,18 @@ function update() {
   const elapsed = now - state.start;
   const left = Math.max(0, TIME_LIMIT - elapsed);
   if (!state.over) {
-    // CPU typing
+    // CPU typing — per-char push
     const cpuLenFactor = 6 / Math.max(4, state.cpuWord.r.length);
-    state.cpuProgress += dt * state.cpuSpeed * cpuLenFactor * (1 + state.cpuPeople * 0.012);
+    const prevCpuTyped = state.cpuTyped;
+    state.cpuProgress += dt * state.cpuSpeed * cpuLenFactor;
     const cpuChars = Math.min(state.cpuWord.r.length, Math.floor(state.cpuProgress * state.cpuWord.r.length));
     state.cpuTyped = state.cpuWord.r.slice(0, cpuChars);
+    const newCpuChars = state.cpuTyped.length - prevCpuTyped.length;
+    if (newCpuChars > 0) {
+      state.rope -= 0.0055 * newCpuChars;
+      state.cpuHit = Math.max(state.cpuHit, 0.35);
+    }
     if (state.cpuProgress >= 1) cpuFinishWord();
-    // rope force
-    const force = (state.playerPeople - state.cpuPeople) * 0.000019;
-    state.rope += force * dt;
     if (state.rope < state.metrics.lowestRope) state.metrics.lowestRope = state.rope;
     if (state.rope > state.metrics.highestRope) state.metrics.highestRope = state.rope;
     if (state.rope >= 1) triggerGameOver('win');
@@ -996,7 +992,7 @@ function draw(left) {
 function renderUI(left) {
   const rushLeft = Math.max(0, state.rushUntil - performance.now());
   ui.combo.textContent = state.combo;
-  ui.power.textContent = state.playerPeople + '人';
+  ui.power.textContent = state.charCombo;
   ui.time.textContent = (left / 1000).toFixed(1);
   ui.badge.textContent = 'L' + state.word.lv + ' / +' + state.word.lv + '人';
   ui.kana.textContent = state.word.k;
